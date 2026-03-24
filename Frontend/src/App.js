@@ -7,7 +7,7 @@ const [answer,setAnswer] = useState("")
 
 async function askLegal(){
 
-const res = await fetch("http://localhost:5000/ask-legal",{
+const res = await fetch("https://nnit-legal-ai-production.up.railway.app/ask-legal",{
 method:"POST",
 headers:{ "Content-Type":"application/json"},
 body: JSON.stringify({question})

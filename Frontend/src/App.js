@@ -1,42 +1,27 @@
-import { useState } from "react"
+import {BrowserRouter,Routes,Route} from "react-router-dom"
+
+import Dashboard from "./pages/Dashboard"
+import Login from "./pages/Login"
+import Register from "./pages/Register"
 
 function App(){
 
-const [question,setQuestion] = useState("")
-const [answer,setAnswer] = useState("")
-
-async function askLegal(){
-
-const res = await fetch("https://nnit-legal-ai-production.up.railway.app/ask-legal",{
-method:"POST",
-headers:{ "Content-Type":"application/json"},
-body: JSON.stringify({question})
-})
-
-const data = await res.json()
-setAnswer(data.answer)
-}
-
 return(
 
-<div>
+<BrowserRouter>
 
-<h1>NNIT AI Lawyer</h1>
+<Routes>
 
-<textarea
-value={question}
-onChange={(e)=>setQuestion(e.target.value)}
-/>
+<Route path="/" element={<Dashboard/>}/>
+<Route path="/login" element={<Login/>}/>
+<Route path="/register" element={<Register/>}/>
 
-<button onClick={askLegal}>
-Ask Legal AI
-</button>
+</Routes>
 
-<p>{answer}</p>
-
-</div>
+</BrowserRouter>
 
 )
+
 }
 
 export default App

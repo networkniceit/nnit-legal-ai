@@ -1,46 +1,39 @@
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
-import pg from "pg"
+import mongoose from "mongoose"
 
-const { Pool } = pg
-const pool = new Pool({ connectionString: process.env.DATABASE_URL })
+const userSchema = new mongoose.Schema({
+  email: { type: String, unique: true },
+  password: String
+})
+const User = mongoose.models.User || mongoose.model("User", userSchema)
 
-export async function register(req,res){
-
-const {email,password} = req.body
-
-const hashed = await bcrypt.hash(password,10)
-
-await pool.query(
-"INSERT INTO users(email,password) VALUES($1,$2)",
-[email,hashed]
-)
-
-res.json({message:"User created"})
+if (!mongoose.connection.readyState) {
+  mongoose.connect(process.env.MONGODB_URI)
 }
 
-export async function login(req,res){
-
-const {email,password} = req.body
-
-const result = await pool.query(
-"SELECT * FROM users WHERE email=$1",
-[email]
-)
-
-if(result.rows.length === 0){
-return res.status(401).json({error:"Invalid credentials"})
+export async function register(req, res) {
+  try {
+    const { email, password } = req.body
+    const hashed = await bcrypt.hash(password, 10)
+    const user = new User({ email, password: hashed })
+    await user.save()
+    res.json({ message: "User created" })
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
 }
 
-const user = result.rows[0]
-
-const valid = await bcrypt.compare(password,user.password)
-
-if(!valid){
-return res.status(401).json({error:"Invalid credentials"})
-}
-
-const token = jwt.sign({id:user.id},"secret",{expiresIn:"24h"})
-
-res.json({token})
+export async function login(req, res) {
+  try {
+    const { email, password } = req.body
+    const user = await User.findOne({ email })
+    if (!user) return res.status(401).json({ error: "Invalid credentials" })
+    const valid = await bcrypt.compare(password, user.password)
+    if (!valid) return res.status(401).json({ error: "Invalid credentials" })
+    const token = jwt.sign({ id: user._id }, process.env.ADMIN_KEY || "secret", { expiresIn: "24h" })
+    res.json({ token })
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
 }

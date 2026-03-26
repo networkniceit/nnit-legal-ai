@@ -1,7 +1,7 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const OPENAI_KEY = "REMOVED";
+const OPENAI_KEY = process.env.REACT_APP_OPENAI_KEY || "";
 
 export default function CaseBuilder() {
   const navigate = useNavigate();

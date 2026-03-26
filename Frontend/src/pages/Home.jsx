@@ -1,4 +1,4 @@
-ï»¿import React from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function Home() {
@@ -49,7 +49,7 @@ export default function Home() {
         </div>
       </div>
       <div style={{ background: "#1a1a2e", padding: "30px", textAlign: "center", color: "#666", fontSize: "13px" }}>
-        NNIT AI Legal Assistant â€” networkniceit@gmail.com â€” Solomon Omomeje Ayodele
+        NNIT AI Legal Assistant — networkniceit@gmail.com — Solomon Omomeje Ayodele
         <br/>Note: AI legal advice is informational only. Consult a licensed attorney for official representation.
       </div>
     </div>

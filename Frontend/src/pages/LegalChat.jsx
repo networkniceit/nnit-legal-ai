@@ -1,7 +1,7 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const OPENAI_KEY = "REMOVED";
+const OPENAI_KEY = process.env.REACT_APP_OPENAI_KEY || "";
 
 const languages = { en: "English", de: "Deutsch", fr: "Francais", es: "Espanol", ar: "Arabic", zh: "Chinese", hi: "Hindi", pt: "Portugues", ru: "Russian", ja: "Japanese", ko: "Korean", tr: "Turkce" };
 

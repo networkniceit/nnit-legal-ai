@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-const OPENAI_KEY = process.env.REACT_APP_OPENAI_KEY || "";
+import api from "../api";
 
 const docTypes = [
   { id: "nda", name: "Non-Disclosure Agreement (NDA)", fields: ["Party A Name", "Party B Name", "Duration", "Governing Law"] },
@@ -27,23 +26,9 @@ export default function DocumentGenerator() {
     setGenerated("");
     try {
       const fieldInfo = Object.entries(fields).map(([k, v]) => k + ": " + v).join("\n");
-      const response = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + OPENAI_KEY },
-        body: JSON.stringify({
-          model: "gpt-4",
-          messages: [{
-            role: "system",
-            content: "You are a professional legal document generator. Generate complete, professional, legally sound documents. Include all standard clauses, proper formatting, signature blocks, and legal language appropriate for Germany/EU jurisdiction unless specified otherwise."
-          }, {
-            role: "user",
-            content: "Generate a complete " + selectedDoc.name + " with these details:\n\n" + fieldInfo + "\n\nMake it professional, comprehensive and legally sound."
-          }],
-          max_tokens: 4000
-        })
-      });
-      const data = await response.json();
-      setGenerated(data.choices[0].message.content);
+      const question = "Generate a complete " + selectedDoc.name + " with these details:\n\n" + fieldInfo + "\n\nMake it professional, comprehensive and legally sound for Germany/EU jurisdiction.";
+      const res = await api.post("/legal/chat", { question });
+      setGenerated(res.data.answer);
     } catch (err) {
       setGenerated("Error generating document. Please try again.");
     }
@@ -85,7 +70,7 @@ export default function DocumentGenerator() {
                 </div>
               ))}
               <button onClick={generateDoc} disabled={loading} style={{ width: "100%", padding: "14px", background: loading ? "#444" : "#fd7e14", color: "white", border: "none", borderRadius: "8px", cursor: loading ? "not-allowed" : "pointer", fontWeight: "bold", fontSize: "16px", marginTop: "10px" }}>
-                {loading ? "Generating with GPT-4..." : "Generate Document"}
+                {loading ? "Generating..." : "Generate Document"}
               </button>
             </div>
             {generated && (

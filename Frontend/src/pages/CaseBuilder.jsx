@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-const OPENAI_KEY = process.env.REACT_APP_OPENAI_KEY || "";
+import api from "../api";
 
 export default function CaseBuilder() {
   const navigate = useNavigate();
@@ -13,41 +12,9 @@ export default function CaseBuilder() {
     setLoading(true);
     setResult("");
     try {
-      const response = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + OPENAI_KEY },
-        body: JSON.stringify({
-          model: "gpt-4",
-          messages: [{
-            role: "system",
-            content: "You are an expert litigation strategist and legal advisor. Build comprehensive legal case strategies with detailed arguments, evidence requirements, and step-by-step action plans."
-          }, {
-            role: "user",
-            content: `Build a complete legal case strategy:
-
-Case Type: ${form.caseType}
-Jurisdiction: ${form.jurisdiction}
-Facts: ${form.facts}
-Goal: ${form.goal}
-Opponent: ${form.opponent}
-
-Provide:
-1. Case Assessment & Strength Analysis
-2. Legal Arguments (with law citations)
-3. Evidence Checklist
-4. Witness Requirements
-5. Timeline and Deadlines
-6. Court Filing Strategy
-7. Possible Defenses from Opponent
-8. Settlement Strategy
-9. Risk Analysis
-10. Step-by-Step Action Plan`
-          }],
-          max_tokens: 4000
-        })
-      });
-      const data = await response.json();
-      setResult(data.choices[0].message.content);
+      const question = `Build a complete legal case strategy:\n\nCase Type: ${form.caseType}\nJurisdiction: ${form.jurisdiction}\nFacts: ${form.facts}\nGoal: ${form.goal}\nOpponent: ${form.opponent}\n\nProvide: 1) Case Assessment, 2) Legal Arguments, 3) Evidence Checklist, 4) Timeline, 5) Court Filing Strategy, 6) Risk Analysis, 7) Action Plan`;
+      const res = await api.post("/legal/chat", { question });
+      setResult(res.data.answer);
     } catch (err) {
       setResult("Error building case. Please try again.");
     }

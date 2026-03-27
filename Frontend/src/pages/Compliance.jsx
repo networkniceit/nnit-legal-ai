@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-const OPENAI_KEY = process.env.REACT_APP_OPENAI_KEY || "";
+import api from "../api";
 
 export default function Compliance() {
   const navigate = useNavigate();
@@ -13,41 +12,9 @@ export default function Compliance() {
     setLoading(true);
     setResult("");
     try {
-      const response = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + OPENAI_KEY },
-        body: JSON.stringify({
-          model: "gpt-4",
-          messages: [{
-            role: "system",
-            content: "You are a legal compliance expert specializing in EU/German business law, GDPR, employment law and regulatory compliance."
-          }, {
-            role: "user",
-            content: `Perform a comprehensive compliance audit:
-
-Business Type: ${form.businessType}
-Country: ${form.country}
-Employees: ${form.employees}
-Business Activities: ${form.activities}
-Data Handling: ${form.dataHandling}
-
-Provide:
-1. GDPR Compliance Status
-2. Employment Law Compliance
-3. Business Registration Requirements
-4. Tax Obligations
-5. Industry-Specific Regulations
-6. Data Protection Requirements
-7. Compliance Violations Found
-8. Risk Score (1-10)
-9. Priority Action Items
-10. Recommended Legal Steps`
-          }],
-          max_tokens: 3000
-        })
-      });
-      const data = await response.json();
-      setResult(data.choices[0].message.content);
+      const question = `Perform a comprehensive compliance audit:\n\nBusiness Type: ${form.businessType}\nCountry: ${form.country}\nEmployees: ${form.employees}\nBusiness Activities: ${form.activities}\nData Handling: ${form.dataHandling}\n\nProvide: 1) GDPR Compliance, 2) Employment Law, 3) Business Registration, 4) Tax Obligations, 5) Risk Score, 6) Action Items`;
+      const res = await api.post("/legal/chat", { question });
+      setResult(res.data.answer);
     } catch (err) {
       setResult("Error scanning compliance. Please try again.");
     }

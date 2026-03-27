@@ -1,37 +1,15 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-const OPENAI_KEY = process.env.REACT_APP_OPENAI_KEY || "";
+import api from "../api";
 
 const languages = { en: "English", de: "Deutsch", fr: "Francais", es: "Espanol", ar: "Arabic", zh: "Chinese", hi: "Hindi", pt: "Portugues", ru: "Russian", ja: "Japanese", ko: "Korean", tr: "Turkce" };
 
 export default function LegalChat() {
   const navigate = useNavigate();
-  const [messages, setMessages] = useState([{ role: "assistant", content: "Hello! I am NNIT AI Legal Assistant powered by GPT-4. I can help you with legal questions, contract advice, tenant rights, employment law, business law, and more. How can I help you today?" }]);
+  const [messages, setMessages] = useState([{ role: "assistant", content: "Hello! I am NNIT AI Legal Assistant. I can help you with legal questions, contract advice, tenant rights, employment law, business law, and more. How can I help you today?" }]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [language, setLanguage] = useState("en");
-
-  const systemPrompt = `You are NNIT AI Legal Assistant, a professional legal advisor powered by GPT-4. You are owned by Solomon Omomeje Ayodele, NNIT - Network Nice IT Tec (networkniceit@gmail.com).
-
-You provide expert legal advice on:
-- Contract law and analysis
-- Employment law and workers rights
-- Tenant and landlord disputes
-- Business law and compliance
-- Criminal law explanations
-- Family law
-- Intellectual property
-- GDPR and data protection (especially for Germany/EU)
-- Immigration law
-- Consumer rights
-
-Guidelines:
-- Respond in ${language === "en" ? "English" : language === "de" ? "German" : language === "fr" ? "French" : language === "es" ? "Spanish" : language === "ar" ? "Arabic" : language === "zh" ? "Chinese" : language === "hi" ? "Hindi" : "English"}
-- Be professional, clear and thorough
-- Cite relevant laws when applicable
-- Always note that for official court representation, a licensed attorney is required
-- Provide actionable advice and next steps`;
 
   const sendMessage = async () => {
     if (!input.trim() || loading) return;
@@ -40,18 +18,9 @@ Guidelines:
     setInput("");
     setLoading(true);
     try {
-      const response = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + OPENAI_KEY },
-        body: JSON.stringify({
-          model: "gpt-4",
-          messages: [{ role: "system", content: systemPrompt }, ...messages, userMsg],
-          max_tokens: 2000
-        })
-      });
-      const data = await response.json();
-      const reply = data.choices[0].message.content;
-      setMessages(prev => [...prev, { role: "assistant", content: reply }]);
+      const question = `Respond in ${languages[language]}. ${input}`;
+      const res = await api.post("/legal/chat", { question });
+      setMessages(prev => [...prev, { role: "assistant", content: res.data.answer }]);
     } catch (err) {
       setMessages(prev => [...prev, { role: "assistant", content: "Error connecting to AI. Please try again." }]);
     }
@@ -77,7 +46,6 @@ Guidelines:
           {Object.entries(languages).map(([code, name]) => <option key={code} value={code} style={{ color: "#333" }}>{name}</option>)}
         </select>
       </div>
-
       <div style={{ padding: "15px 20px", background: "#0f0f1a", borderBottom: "1px solid #222" }}>
         <p style={{ color: "#666", fontSize: "12px", margin: "0 0 8px 0" }}>Quick questions:</p>
         <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
@@ -86,7 +54,6 @@ Guidelines:
           ))}
         </div>
       </div>
-
       <div style={{ flex: 1, overflowY: "auto", padding: "20px", maxWidth: "900px", width: "100%", margin: "0 auto" }}>
         {messages.map((msg, i) => (
           <div key={i} style={{ marginBottom: "20px", display: "flex", justifyContent: msg.role === "user" ? "flex-end" : "flex-start" }}>
@@ -97,19 +64,14 @@ Guidelines:
         ))}
         {loading && (
           <div style={{ display: "flex", justifyContent: "flex-start", marginBottom: "20px" }}>
-            <div style={{ padding: "15px 20px", background: "#1a1a2e", borderRadius: "20px 20px 20px 5px", border: "1px solid #333", color: "#667eea" }}>
-              AI is thinking...
-            </div>
+            <div style={{ padding: "15px 20px", background: "#1a1a2e", borderRadius: "20px 20px 20px 5px", border: "1px solid #333", color: "#667eea" }}>AI is thinking...</div>
           </div>
         )}
       </div>
-
       <div style={{ padding: "20px", background: "#1a1a2e", borderTop: "1px solid #333" }}>
         <div style={{ maxWidth: "900px", margin: "0 auto", display: "flex", gap: "10px" }}>
           <textarea value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); }}} placeholder="Ask your legal question..." rows={2} style={{ flex: 1, padding: "12px", background: "#2a2a3e", border: "1px solid #444", borderRadius: "10px", color: "white", fontSize: "14px", resize: "none", fontFamily: "inherit" }} />
-          <button onClick={sendMessage} disabled={loading || !input.trim()} style={{ padding: "12px 24px", background: loading ? "#444" : "linear-gradient(135deg, #667eea, #764ba2)", color: "white", border: "none", borderRadius: "10px", cursor: loading ? "not-allowed" : "pointer", fontWeight: "bold", fontSize: "14px" }}>
-            Send
-          </button>
+          <button onClick={sendMessage} disabled={loading || !input.trim()} style={{ padding: "12px 24px", background: loading ? "#444" : "linear-gradient(135deg, #667eea, #764ba2)", color: "white", border: "none", borderRadius: "10px", cursor: loading ? "not-allowed" : "pointer", fontWeight: "bold", fontSize: "14px" }}>Send</button>
         </div>
         <p style={{ color: "#444", fontSize: "11px", textAlign: "center", marginTop: "10px" }}>AI legal advice is informational only. Consult a licensed attorney for official representation.</p>
       </div>

@@ -7,6 +7,16 @@ export default function ContractAnalyzer() {
   const [contractText, setContractText] = useState("");
   const [analysis, setAnalysis] = useState("");
   const [loading, setLoading] = useState(false);
+  const [fileName, setFileName] = useState("");
+
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setFileName(file.name);
+    const reader = new FileReader();
+    reader.onload = (ev) => setContractText(ev.target.result);
+    reader.readAsText(file);
+  };
 
   const analyzeContract = async () => {
     if (!contractText.trim()) return;
@@ -34,19 +44,51 @@ export default function ContractAnalyzer() {
       <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "30px 20px" }}>
         <div style={{ display: "grid", gridTemplateColumns: analysis ? "1fr 1fr" : "1fr", gap: "20px" }}>
           <div style={{ background: "#1a1a2e", borderRadius: "12px", padding: "25px", border: "1px solid #333" }}>
-            <h3 style={{ color: "#28a745", marginBottom: "15px" }}>Paste Your Contract</h3>
-            <textarea value={contractText} onChange={e => setContractText(e.target.value)} placeholder="Paste your contract text here for AI analysis..." rows={20} style={{ width: "100%", padding: "15px", background: "#0a0a1a", border: "1px solid #444", borderRadius: "8px", color: "white", fontSize: "14px", resize: "vertical", fontFamily: "monospace", boxSizing: "border-box" }} />
-            <button onClick={analyzeContract} disabled={loading || !contractText.trim()} style={{ width: "100%", padding: "14px", background: loading ? "#444" : "#28a745", color: "white", border: "none", borderRadius: "8px", cursor: loading ? "not-allowed" : "pointer", fontWeight: "bold", fontSize: "16px", marginTop: "15px" }}>
+            <h3 style={{ color: "#28a745", marginBottom: "15px" }}>Upload or Paste Your Contract</h3>
+
+            {/* FILE UPLOAD BUTTON */}
+            <div style={{ marginBottom: "16px" }}>
+              <label htmlFor="contractFile" style={{ display: "inline-block", padding: "10px 20px", background: "#28a745", color: "white", borderRadius: "8px", cursor: "pointer", fontWeight: "bold", fontSize: "14px" }}>
+                📁 Upload File (PDF, DOC, TXT)
+              </label>
+              <input
+                id="contractFile"
+                type="file"
+                accept=".txt,.doc,.docx,.pdf,.csv"
+                style={{ display: "none" }}
+                onChange={handleFileUpload}
+              />
+              {fileName && <span style={{ marginLeft: "12px", color: "#28a745", fontSize: "13px" }}>✅ {fileName}</span>}
+            </div>
+
+            <div style={{ textAlign: "center", color: "#555", marginBottom: "12px", fontSize: "13px" }}>— or paste text below —</div>
+
+            <textarea
+              value={contractText}
+              onChange={e => setContractText(e.target.value)}
+              placeholder="Paste your contract text here for AI analysis..."
+              rows={16}
+              style={{ width: "100%", padding: "15px", background: "#0a0a1a", border: "1px solid #444", borderRadius: "8px", color: "white", fontSize: "14px", resize: "vertical", fontFamily: "monospace", boxSizing: "border-box" }}
+            />
+            <button
+              onClick={analyzeContract}
+              disabled={loading || !contractText.trim()}
+              style={{ width: "100%", padding: "14px", background: loading ? "#444" : "#28a745", color: "white", border: "none", borderRadius: "8px", cursor: loading ? "not-allowed" : "pointer", fontWeight: "bold", fontSize: "16px", marginTop: "15px" }}
+            >
               {loading ? "Analyzing..." : "Analyze Contract"}
             </button>
           </div>
+
           {analysis && (
             <div style={{ background: "#1a1a2e", borderRadius: "12px", padding: "25px", border: "1px solid #28a745" }}>
               <h3 style={{ color: "#28a745", marginBottom: "15px" }}>AI Analysis Result</h3>
               <div style={{ background: "#0a0a1a", padding: "20px", borderRadius: "8px", maxHeight: "600px", overflowY: "auto" }}>
                 <pre style={{ whiteSpace: "pre-wrap", color: "#e0e0e0", fontSize: "14px", lineHeight: "1.7", fontFamily: "inherit", margin: 0 }}>{analysis}</pre>
               </div>
-              <button onClick={() => navigator.clipboard.writeText(analysis)} style={{ marginTop: "15px", padding: "10px 20px", background: "#333", color: "white", border: "none", borderRadius: "6px", cursor: "pointer" }}>Copy Analysis</button>
+              <div style={{ display: "flex", gap: "10px", marginTop: "15px" }}>
+                <button onClick={() => navigator.clipboard.writeText(analysis)} style={{ flex: 1, padding: "10px", background: "#333", color: "white", border: "none", borderRadius: "6px", cursor: "pointer" }}>Copy Analysis</button>
+                <button onClick={() => { const blob = new Blob([analysis], {type: "text/plain"}); const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = "contract-analysis.txt"; a.click(); }} style={{ flex: 1, padding: "10px", background: "#28a745", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "bold" }}>Download Report</button>
+              </div>
             </div>
           )}
         </div>

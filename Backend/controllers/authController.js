@@ -6,10 +6,12 @@ const userSchema = new mongoose.Schema({
   email: { type: String, unique: true },
   password: String
 })
+
 const User = mongoose.models.User || mongoose.model("User", userSchema)
 
 if (!mongoose.connection.readyState) {
   mongoose.connect(process.env.MONGODB_URI)
+    .catch(err => console.error("MongoDB connection error:", err.message))
 }
 
 export async function register(req, res) {

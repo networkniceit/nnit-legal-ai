@@ -45,40 +45,19 @@ export default function ContractAnalyzer() {
         <div style={{ display: "grid", gridTemplateColumns: analysis ? "1fr 1fr" : "1fr", gap: "20px" }}>
           <div style={{ background: "#1a1a2e", borderRadius: "12px", padding: "25px", border: "1px solid #333" }}>
             <h3 style={{ color: "#28a745", marginBottom: "15px" }}>Upload or Paste Your Contract</h3>
-
-            {/* FILE UPLOAD BUTTON */}
             <div style={{ marginBottom: "16px" }}>
               <label htmlFor="contractFile" style={{ display: "inline-block", padding: "10px 20px", background: "#28a745", color: "white", borderRadius: "8px", cursor: "pointer", fontWeight: "bold", fontSize: "14px" }}>
-                📁 Upload File (PDF, DOC, TXT)
+                Upload File (PDF, DOC, TXT)
               </label>
-              <input
-                id="contractFile"
-                type="file"
-                accept=".txt,.doc,.docx,.pdf,.csv"
-                style={{ display: "none" }}
-                onChange={handleFileUpload}
-              />
-              {fileName && <span style={{ marginLeft: "12px", color: "#28a745", fontSize: "13px" }}>✅ {fileName}</span>}
+              <input id="contractFile" type="file" accept=".txt,.doc,.docx,.pdf,.csv" style={{ display: "none" }} onChange={handleFileUpload} />
+              {fileName && <span style={{ marginLeft: "12px", color: "#28a745", fontSize: "13px" }}>{fileName}</span>}
             </div>
-
-            <div style={{ textAlign: "center", color: "#555", marginBottom: "12px", fontSize: "13px" }}>— or paste text below —</div>
-
-            <textarea
-              value={contractText}
-              onChange={e => setContractText(e.target.value)}
-              placeholder="Paste your contract text here for AI analysis..."
-              rows={16}
-              style={{ width: "100%", padding: "15px", background: "#0a0a1a", border: "1px solid #444", borderRadius: "8px", color: "white", fontSize: "14px", resize: "vertical", fontFamily: "monospace", boxSizing: "border-box" }}
-            />
-            <button
-              onClick={analyzeContract}
-              disabled={loading || !contractText.trim()}
-              style={{ width: "100%", padding: "14px", background: loading ? "#444" : "#28a745", color: "white", border: "none", borderRadius: "8px", cursor: loading ? "not-allowed" : "pointer", fontWeight: "bold", fontSize: "16px", marginTop: "15px" }}
-            >
+            <div style={{ textAlign: "center", color: "#555", marginBottom: "12px", fontSize: "13px" }}>or paste text below</div>
+            <textarea value={contractText} onChange={e => setContractText(e.target.value)} placeholder="Paste your contract text here..." rows={16} style={{ width: "100%", padding: "15px", background: "#0a0a1a", border: "1px solid #444", borderRadius: "8px", color: "white", fontSize: "14px", resize: "vertical", fontFamily: "monospace", boxSizing: "border-box" }} />
+            <button onClick={analyzeContract} disabled={loading || !contractText.trim()} style={{ width: "100%", padding: "14px", background: loading ? "#444" : "#28a745", color: "white", border: "none", borderRadius: "8px", cursor: loading ? "not-allowed" : "pointer", fontWeight: "bold", fontSize: "16px", marginTop: "15px" }}>
               {loading ? "Analyzing..." : "Analyze Contract"}
             </button>
           </div>
-
           {analysis && (
             <div style={{ background: "#1a1a2e", borderRadius: "12px", padding: "25px", border: "1px solid #28a745" }}>
               <h3 style={{ color: "#28a745", marginBottom: "15px" }}>AI Analysis Result</h3>

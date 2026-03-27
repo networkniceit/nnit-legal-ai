@@ -1,11 +1,10 @@
+import dotenv from "dotenv"
+dotenv.config()
 import OpenAI from "openai"
-
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 })
-
 export async function askLegalAI(question) {
-
   const completion = await openai.chat.completions.create({
     model: "gpt-4o-mini",
     messages: [
@@ -19,6 +18,5 @@ export async function askLegalAI(question) {
       }
     ]
   })
-
   return completion.choices[0].message.content
 }

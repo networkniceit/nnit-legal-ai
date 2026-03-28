@@ -8,7 +8,9 @@ import contractRoutes from "./routes/contractRoutes.js"
 import caseRoutes from "./routes/caseRoutes.js"
 import complianceRoutes from "./routes/complianceRoutes.js"
 import uploadRoutes from "./routes/uploadRoutes.js"
-import aiRoutes from "./routes/aiRoute.js"`napp.use("/api/legal-ai", aiRoutes)`n
+import aiRoutes from "./routes/aiRoute.js"
+app.use("/api/legal-ai", aiRoutes)
+
 const app = express()
 
 app.use(cors({
@@ -31,4 +33,5 @@ const PORT = process.env.PORT || 5000
 app.listen(PORT, () => {
   console.log("NNIT Legal AI running on port " + PORT)
 })
+
 

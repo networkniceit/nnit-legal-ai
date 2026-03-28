@@ -9,7 +9,6 @@ import caseRoutes from "./routes/caseRoutes.js"
 import complianceRoutes from "./routes/complianceRoutes.js"
 import uploadRoutes from "./routes/uploadRoutes.js"
 import aiRoutes from "./routes/aiRoute.js"
-app.use("/api/legal-ai", aiRoutes)
 
 const app = express()
 
@@ -18,7 +17,6 @@ app.use(cors({
   methods: ["GET","POST","PUT","DELETE","OPTIONS"],
   allowedHeaders: ["Content-Type","Authorization"]
 }))
-
 app.options("*", cors())
 app.use(express.json())
 
@@ -28,10 +26,9 @@ app.use("/contracts", contractRoutes)
 app.use("/cases", caseRoutes)
 app.use("/compliance", complianceRoutes)
 app.use("/upload", uploadRoutes)
+app.use("/api/legal-ai", aiRoutes)
 
 const PORT = process.env.PORT || 5000
 app.listen(PORT, () => {
   console.log("NNIT Legal AI running on port " + PORT)
 })
-
-

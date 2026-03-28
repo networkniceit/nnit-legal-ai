@@ -68,7 +68,7 @@ Provide:
 
   const completion = await openai.chat.completions.create({
 
-    model: "gpt-4o-mini",
+    model: "llama-3.3-70b-versatile",
 
     messages:[
       { role:"system", content:"You are a legal research assistant." },

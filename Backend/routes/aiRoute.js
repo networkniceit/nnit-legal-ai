@@ -1,14 +1,12 @@
 import express from "express"
-import OpenAI from "openai"
-
+import Groq from "groq-sdk"
 const router = express.Router()
-const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
-
+const client = new Groq({ apiKey: process.env.GROQ_API_KEY })
 router.post("/", async (req, res) => {
   try {
     const { messages, systemPrompt, max_tokens } = req.body
     const response = await client.chat.completions.create({
-      model: "gpt-4",
+      model: "llama-3.3-70b-versatile",
       max_tokens: max_tokens || 1500,
       messages: [
         { role: "system", content: systemPrompt || "You are NNIT Legal AI, a professional legal assistant." },
@@ -20,5 +18,4 @@ router.post("/", async (req, res) => {
     res.status(500).json({ error: err.message })
   }
 })
-
 export default router

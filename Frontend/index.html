@@ -1,13 +1,985 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>frontend</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
-</html>
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>NNIT Legal AI — Professional Legal Assistant</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#08090d;
+  --surface:#0f1117;
+  --panel:#151821;
+  --border:#1e2130;
+  --accent:#4f7cff;
+  --accent2:#7c4fff;
+  --gold:#f0c040;
+  --success:#22c55e;
+  --danger:#ef4444;
+  --warn:#f59e0b;
+  --text:#e8eaf0;
+  --muted:#6b7280;
+  --rail:https://nnit-legal-ai-production.up.railway.app;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;overflow:hidden}
+h1,h2,h3,.brand{font-family:'Syne',sans-serif}
+
+/* LAYOUT */
+.shell{display:flex;height:100vh}
+.sidebar{width:240px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:56px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0}
+.content{flex:1;overflow-y:auto;padding:24px}
+
+/* SIDEBAR */
+.brand-logo{padding:20px 16px 12px;border-bottom:1px solid var(--border)}
+.brand-logo .name{font-size:18px;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.brand-logo .sub{font-size:10px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-top:2px}
+
+.nav-section{padding:12px 0}
+.nav-label{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:4px 16px 8px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;border-radius:0;transition:all .15s;font-size:13.5px;color:var(--muted);border-left:3px solid transparent}
+.nav-item:hover{background:rgba(79,124,255,.07);color:var(--text)}
+.nav-item.active{background:rgba(79,124,255,.12);color:var(--accent);border-left-color:var(--accent)}
+.nav-item .icon{width:18px;text-align:center;font-size:15px}
+
+.sidebar-footer{margin-top:auto;padding:16px;border-top:1px solid var(--border);font-size:11px;color:var(--muted)}
+.sidebar-footer .email{color:var(--accent);font-size:11px;word-break:break-all}
+
+/* STATUS PILLS */
+.pills{display:flex;gap:6px;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--border)}
+.pill{font-size:10px;padding:3px 8px;border-radius:20px;font-weight:600;letter-spacing:.03em}
+.pill.green{background:rgba(34,197,94,.15);color:var(--success)}
+.pill.blue{background:rgba(79,124,255,.15);color:var(--accent)}
+.pill.gold{background:rgba(240,192,64,.15);color:var(--gold)}
+
+/* TOPBAR */
+.page-title{font-size:16px;font-weight:700;font-family:'Syne',sans-serif}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.user-chip{font-size:12px;color:var(--muted);background:var(--panel);padding:5px 10px;border-radius:6px;border:1px solid var(--border)}
+
+/* CARDS GRID */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-bottom:24px}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:18px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(79,124,255,.06),transparent);opacity:0;transition:.2s}
+.card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.card:hover::before{opacity:1}
+.card .c-icon{font-size:26px;margin-bottom:10px}
+.card .c-title{font-size:13px;font-weight:700;font-family:'Syne',sans-serif;margin-bottom:4px}
+.card .c-desc{font-size:11px;color:var(--muted);line-height:1.5}
+.card .c-badge{position:absolute;top:12px;right:12px;font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;background:rgba(79,124,255,.2);color:var(--accent)}
+
+/* PANELS */
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:20px}
+.panel-title{font-size:14px;font-weight:700;font-family:'Syne',sans-serif;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+
+/* INPUTS */
+textarea,input,select{background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;border-radius:8px;padding:10px 12px;width:100%;outline:none;transition:border .15s}
+textarea:focus,input:focus,select:focus{border-color:var(--accent)}
+textarea{resize:vertical;min-height:90px;line-height:1.6}
+select option{background:var(--bg)}
+label{font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:8px;font-family:'Syne',sans-serif;font-weight:600;font-size:13px;cursor:pointer;border:none;transition:all .15s}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+.btn-primary:hover{opacity:.9;transform:translateY(-1px)}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+.btn-sm{padding:6px 12px;font-size:12px}
+.btn-danger{background:rgba(239,68,68,.15);color:var(--danger);border:1px solid rgba(239,68,68,.25)}
+
+/* CHAT */
+.chat-messages{min-height:300px;max-height:420px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;padding:4px 0 12px}
+.msg{max-width:80%;padding:12px 14px;border-radius:12px;font-size:13px;line-height:1.65;animation:fadeUp .2s ease}
+.msg.user{align-self:flex-end;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-radius:12px 12px 2px 12px}
+.msg.ai{align-self:flex-start;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:12px 12px 12px 2px}
+.msg.ai .msg-label{font-size:10px;font-weight:700;color:var(--accent);margin-bottom:5px;letter-spacing:.05em;text-transform:uppercase}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* CHAT INPUT */
+.chat-input-row{display:flex;gap:8px;margin-top:12px;align-items:flex-end}
+.chat-input-row textarea{min-height:44px;max-height:120px}
+
+/* RESULT BOX */
+.result-box{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px;font-size:13px;line-height:1.7;white-space:pre-wrap;min-height:60px;color:var(--text)}
+.result-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+
+/* LOADING */
+.loading{display:inline-flex;gap:4px;align-items:center}
+.loading span{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:bounce .8s infinite}
+.loading span:nth-child(2){animation-delay:.15s}
+.loading span:nth-child(3){animation-delay:.3s}
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}
+
+/* CAMERA */
+#camera-video{width:100%;max-height:300px;object-fit:cover;border-radius:8px;background:#000}
+#camera-canvas{display:none}
+
+/* TEMPLATES GRID */
+.tmpl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
+.tmpl-card{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;cursor:pointer;transition:all .15s;font-size:12px}
+.tmpl-card:hover{border-color:var(--accent);color:var(--accent)}
+.tmpl-card .t-icon{font-size:20px;margin-bottom:6px}
+.tmpl-card .t-name{font-weight:600;margin-bottom:2px}
+.tmpl-card .t-cat{font-size:10px;color:var(--muted)}
+
+/* CASE BUILDER SELECTS */
+.select-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px}
+
+/* COMPLIANCE TYPES */
+.biz-types{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.biz-btn{padding:7px 14px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--muted);font-size:12px;cursor:pointer;font-family:'Syne',sans-serif;font-weight:600;transition:all .15s}
+.biz-btn.active,.biz-btn:hover{border-color:var(--accent);color:var(--accent);background:rgba(79,124,255,.1)}
+
+/* SAVED DOCS */
+.doc-row{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;margin-bottom:8px}
+.doc-row .doc-name{flex:1;font-size:13px;font-weight:600}
+.doc-row .doc-date{font-size:11px;color:var(--muted)}
+
+/* UPLOAD */
+.dropzone{border:2px dashed var(--border);border-radius:10px;padding:40px;text-align:center;cursor:pointer;transition:all .2s;color:var(--muted)}
+.dropzone:hover,.dropzone.drag{border-color:var(--accent);color:var(--accent);background:rgba(79,124,255,.05)}
+.dropzone .dz-icon{font-size:36px;margin-bottom:10px}
+
+/* PAGES */
+.page{display:none}
+.page.active{display:block}
+
+/* NOTICE */
+.notice{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:8px;padding:10px 14px;font-size:11.5px;color:var(--warn);margin-bottom:16px}
+
+/* VOICE */
+.voice-btn{width:64px;height:64px;border-radius:50%;border:none;font-size:26px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center}
+.voice-btn.idle{background:rgba(79,124,255,.15);color:var(--accent)}
+.voice-btn.recording{background:var(--danger);color:#fff;animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.4)}50%{box-shadow:0 0 0 12px rgba(239,68,68,0)}}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+
+/* STATS ROW */
+.stats-row{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:24px}
+.stat-card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center}
+.stat-card .s-num{font-size:22px;font-weight:800;font-family:'Syne',sans-serif;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat-card .s-label{font-size:10px;color:var(--muted);margin-top:3px;text-transform:uppercase;letter-spacing:.06em}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="brand-logo">
+    <div class="name">⚖️ NNIT Legal AI</div>
+    <div class="sub">Professional Legal Assistant</div>
+  </div>
+  <div class="pills">
+    <span class="pill blue">GPT-4</span>
+    <span class="pill green">GDPR ✓</span>
+    <span class="pill gold">500+ Tmpl</span>
+    <span class="pill green">🔒 Secure</span>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Main</div>
+    <div class="nav-item active" onclick="gotoPage('dashboard',this)"><span class="icon">🏠</span> Dashboard</div>
+    <div class="nav-item" onclick="gotoPage('chat',this)"><span class="icon">💬</span> AI Legal Chat</div>
+    <div class="nav-item" onclick="gotoPage('upload',this)"><span class="icon">📎</span> Upload Documents</div>
+    <div class="nav-item" onclick="gotoPage('camera',this)"><span class="icon">📷</span> Camera Scanner</div>
+    <div class="nav-item" onclick="gotoPage('docgen',this)"><span class="icon">📄</span> Document Generator</div>
+    <div class="nav-item" onclick="gotoPage('case',this)"><span class="icon">⚖️</span> Case Builder</div>
+    <div class="nav-item" onclick="gotoPage('compliance',this)"><span class="icon">✅</span> Compliance Scanner</div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Tools</div>
+    <div class="nav-item" onclick="gotoPage('analyze',this)"><span class="icon">🔍</span> Contract Analyzer</div>
+    <div class="nav-item" onclick="gotoPage('risk',this)"><span class="icon">⚠️</span> Risk Assessment</div>
+    <div class="nav-item" onclick="gotoPage('deadlines',this)"><span class="icon">📅</span> Extract Deadlines</div>
+    <div class="nav-item" onclick="gotoPage('parties',this)"><span class="icon">👥</span> Identify Parties</div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Templates</div>
+    <div class="nav-item" onclick="gotoPage('templates',this)"><span class="icon">📋</span> 500+ Templates</div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Voice</div>
+    <div class="nav-item" onclick="gotoPage('voicewriter',this)"><span class="icon">🎤</span> Voice Writer</div>
+    <div class="nav-item" onclick="gotoPage('voicereader',this)"><span class="icon">🔊</span> Voice Reader</div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">My Docs</div>
+    <div class="nav-item" onclick="gotoPage('saved',this)"><span class="icon">💾</span> Saved Documents</div>
+  </div>
+  <div class="sidebar-footer">
+    <div class="email">📧 networkniceit@gmail.com</div>
+    <div style="margin-top:4px">Solomon Omomeje Ayodele</div>
+    <div style="margin-top:6px;font-size:10px;line-height:1.5;color:#4a5568">AI advice is informational only. Consult a licensed attorney.</div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="page-title" id="topbar-title">🏠 Dashboard</div>
+    <div class="topbar-right">
+      <div class="user-chip">Solomon · NNIT</div>
+    </div>
+  </div>
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="stats-row">
+        <div class="stat-card"><div class="s-num">500+</div><div class="s-label">Templates</div></div>
+        <div class="stat-card"><div class="s-num">12</div><div class="s-label">Languages</div></div>
+        <div class="stat-card"><div class="s-num">GPT-4</div><div class="s-label">AI Model</div></div>
+        <div class="stat-card"><div class="s-num">GDPR</div><div class="s-label">Compliant</div></div>
+        <div class="stat-card"><div class="s-num">🔒</div><div class="s-label">Confidential</div></div>
+      </div>
+      <div class="grid">
+        <div class="card" onclick="gotoPageById('chat','💬 AI Legal Chat')"><div class="c-icon">💬</div><div class="c-title">AI Legal Chat</div><div class="c-desc">Ask any legal question and get instant AI-powered advice</div></div>
+        <div class="card" onclick="gotoPageById('upload','📎 Upload Documents')"><div class="c-icon">📎</div><div class="c-title">Upload Documents</div><div class="c-desc">Upload contracts and get AI risk analysis instantly</div></div>
+        <div class="card" onclick="gotoPageById('camera','📷 Camera Scanner')"><div class="c-icon">📷</div><div class="c-title">Camera Scanner</div><div class="c-desc">Scan physical legal documents with your camera</div><div class="c-badge">NEW</div></div>
+        <div class="card" onclick="gotoPageById('docgen','📄 Document Generator')"><div class="c-icon">📄</div><div class="c-title">Document Generator</div><div class="c-desc">Generate NDAs, contracts, legal letters instantly</div></div>
+        <div class="card" onclick="gotoPageById('case','⚖️ Case Builder')"><div class="c-icon">⚖️</div><div class="c-title">Case Builder</div><div class="c-desc">Build your legal case with AI strategy</div></div>
+        <div class="card" onclick="gotoPageById('compliance','✅ Compliance Scanner')"><div class="c-icon">✅</div><div class="c-title">Compliance Scanner</div><div class="c-desc">Check your business compliance with AI</div></div>
+        <div class="card" onclick="gotoPageById('analyze','🔍 Contract Analyzer')"><div class="c-icon">🔍</div><div class="c-title">Contract Analyzer</div><div class="c-desc">Deep AI analysis of any contract text</div></div>
+        <div class="card" onclick="gotoPageById('risk','⚠️ Risk Assessment')"><div class="c-icon">⚠️</div><div class="c-title">Risk Assessment</div><div class="c-desc">Identify legal risks in your documents</div></div>
+        <div class="card" onclick="gotoPageById('deadlines','📅 Extract Deadlines')"><div class="c-icon">📅</div><div class="c-title">Extract Deadlines</div><div class="c-desc">Pull all dates and deadlines from contracts</div></div>
+        <div class="card" onclick="gotoPageById('parties','👥 Identify Parties')"><div class="c-icon">👥</div><div class="c-title">Identify Parties</div><div class="c-desc">Extract all parties and obligations</div></div>
+        <div class="card" onclick="gotoPageById('voicewriter','🎤 Voice Writer')"><div class="c-icon">🎤</div><div class="c-title">Voice Writer</div><div class="c-desc">Dictate legal text with continuous recording</div><div class="c-badge">NEW</div></div>
+        <div class="card" onclick="gotoPageById('voicereader','🔊 Voice Reader')"><div class="c-icon">🔊</div><div class="c-title">Voice Reader</div><div class="c-desc">Listen to any legal document read aloud</div><div class="c-badge">NEW</div></div>
+      </div>
+      <div class="notice">⚠️ AI legal advice is informational only. Consult a licensed attorney for official legal representation. · GDPR Compliant · Confidential · Not stored permanently</div>
+    </div>
+
+    <!-- CHAT -->
+    <div class="page" id="page-chat">
+      <div class="panel">
+        <div class="panel-title">💬 AI Legal Chat</div>
+        <div class="chat-messages" id="chat-messages">
+          <div class="msg ai"><div class="msg-label">NNIT Legal AI</div>Hello! I'm your AI legal assistant. Ask me anything about contracts, employment law, GDPR, compliance, intellectual property, or any legal matter. How can I help you today?</div>
+        </div>
+        <div class="chat-input-row">
+          <textarea id="chat-input" placeholder="Ask your legal question..." rows="2" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}"></textarea>
+          <button class="btn btn-primary" onclick="sendChat()">Send ↗</button>
+        </div>
+        <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-ghost btn-sm" onclick="quickChat('What are my rights as an employee?')">Employee rights</button>
+          <button class="btn btn-ghost btn-sm" onclick="quickChat('Explain GDPR compliance for small businesses')">GDPR basics</button>
+          <button class="btn btn-ghost btn-sm" onclick="quickChat('What should an NDA include?')">NDA essentials</button>
+          <button class="btn btn-ghost btn-sm" onclick="quickChat('How do I handle a contract dispute?')">Contract dispute</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- UPLOAD -->
+    <div class="page" id="page-upload">
+      <div class="panel">
+        <div class="panel-title">📎 Upload Documents</div>
+        <div class="dropzone" id="dropzone" onclick="document.getElementById('file-input').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="handleDrop(event)">
+          <div class="dz-icon">📄</div>
+          <div style="font-size:14px;font-weight:600;margin-bottom:6px">Drop your document here or click to browse</div>
+          <div style="font-size:12px">Supports PDF, DOC, DOCX, TXT</div>
+        </div>
+        <input type="file" id="file-input" accept=".pdf,.doc,.docx,.txt" style="display:none" onchange="handleFile(this)"/>
+        <div id="file-content" style="margin-top:14px;display:none">
+          <label>Extracted Document Text</label>
+          <textarea id="file-text" rows="6" placeholder="Document text will appear here..."></textarea>
+          <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+            <button class="btn btn-primary btn-sm" onclick="analyzeUpload('analyze')">🔍 Analyze Contract</button>
+            <button class="btn btn-ghost btn-sm" onclick="analyzeUpload('risk')">⚠️ Risk Assessment</button>
+            <button class="btn btn-ghost btn-sm" onclick="analyzeUpload('deadlines')">📅 Extract Deadlines</button>
+            <button class="btn btn-ghost btn-sm" onclick="analyzeUpload('parties')">👥 Identify Parties</button>
+          </div>
+        </div>
+        <div id="upload-result" class="result-box" style="margin-top:14px;display:none"></div>
+      </div>
+    </div>
+
+    <!-- CAMERA -->
+    <div class="page" id="page-camera">
+      <div class="panel">
+        <div class="panel-title">📷 Camera Scanner</div>
+        <video id="camera-video" autoplay playsinline></video>
+        <canvas id="camera-canvas"></canvas>
+        <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+          <button class="btn btn-primary" id="cam-start-btn" onclick="startCamera()">📷 Start Camera</button>
+          <button class="btn btn-ghost" id="cam-capture-btn" onclick="capturePhoto()" style="display:none">⚡ Capture</button>
+          <button class="btn btn-ghost" id="cam-switch-btn" onclick="switchCamera()" style="display:none">🔄 Switch Camera</button>
+          <button class="btn btn-ghost" id="cam-stop-btn" onclick="stopCamera()" style="display:none">⏹ Stop</button>
+        </div>
+        <div id="camera-result" style="margin-top:14px;display:none">
+          <img id="captured-img" style="width:100%;border-radius:8px;border:1px solid var(--border);margin-bottom:10px"/>
+          <label>Scanned Text (Edit if needed)</label>
+          <textarea id="camera-text" rows="5" placeholder="Captured text will appear here after analysis..."></textarea>
+          <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+            <button class="btn btn-primary btn-sm" onclick="analyzeCamera('analyze')">🔍 Analyze Document</button>
+            <button class="btn btn-ghost btn-sm" onclick="analyzeCamera('risk')">⚠️ Risk Assessment</button>
+            <button class="btn btn-ghost btn-sm" onclick="analyzeCamera('deadlines')">📅 Extract Deadlines</button>
+          </div>
+        </div>
+        <div id="camera-ai-result" class="result-box" style="margin-top:14px;display:none"></div>
+      </div>
+    </div>
+
+    <!-- DOCUMENT GENERATOR -->
+    <div class="page" id="page-docgen">
+      <div class="panel">
+        <div class="panel-title">📄 Document Generator</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+          <div>
+            <label>Document Type</label>
+            <select id="doc-type">
+              <option>Non-Disclosure Agreement (NDA)</option>
+              <option>Employment Contract</option>
+              <option>Service Agreement</option>
+              <option>Partnership Agreement</option>
+              <option>Privacy Policy</option>
+              <option>Terms of Service</option>
+              <option>Cease and Desist Letter</option>
+              <option>Demand Letter</option>
+              <option>Letter of Intent</option>
+              <option>Shareholder Agreement</option>
+              <option>Freelance Contract</option>
+              <option>Lease Agreement</option>
+            </select>
+          </div>
+          <div>
+            <label>Business Type</label>
+            <select id="doc-biz-type">
+              <option>Sole Trader</option>
+              <option>Limited Company (Ltd)</option>
+              <option>Partnership</option>
+              <option>LLP</option>
+              <option>Corporation</option>
+              <option>Non-Profit</option>
+              <option>Startup</option>
+              <option>Freelancer</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+          <div>
+            <label>Your Name / Company</label>
+            <input type="text" id="doc-party1" placeholder="NNIT Tech GmbH"/>
+          </div>
+          <div>
+            <label>Other Party</label>
+            <input type="text" id="doc-party2" placeholder="Client / Partner name"/>
+          </div>
+        </div>
+        <div style="margin-bottom:14px">
+          <label>Key Details & Requirements</label>
+          <textarea id="doc-details" rows="4" placeholder="Describe specific terms, duration, jurisdiction, payment, special clauses..."></textarea>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-primary" onclick="generateDocument()">📄 Generate Document ↗</button>
+          <button class="btn btn-ghost" onclick="document.getElementById('doc-result').textContent='';document.getElementById('doc-result-box').style.display='none'">Clear</button>
+        </div>
+        <div id="doc-result-box" style="margin-top:16px;display:none">
+          <div class="result-box" id="doc-result"></div>
+          <div class="result-actions">
+            <button class="btn btn-ghost btn-sm" onclick="downloadDoc()">⬇ Download</button>
+            <button class="btn btn-ghost btn-sm" onclick="saveDoc('docgen')">💾 Save</button>
+            <button class="btn btn-ghost btn-sm" onclick="readAloud('doc-result')">🔊 Read Aloud</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CASE BUILDER -->
+    <div class="page" id="page-case">
+      <div class="panel">
+        <div class="panel-title">⚖️ Case Builder</div>
+        <div class="select-grid">
+          <div>
+            <label>Case Type</label>
+            <select id="case-type">
+              <option>Contract Dispute</option>
+              <option>Employment Dispute</option>
+              <option>IP Infringement</option>
+              <option>Personal Injury</option>
+              <option>Property Dispute</option>
+              <option>Debt Recovery</option>
+              <option>Criminal Defence</option>
+              <option>GDPR Violation</option>
+              <option>Consumer Rights</option>
+              <option>Defamation</option>
+              <option>Immigration</option>
+              <option>Family Law</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div>
+            <label>Your Position</label>
+            <select id="case-position">
+              <option>Claimant / Plaintiff</option>
+              <option>Defendant</option>
+              <option>Third Party</option>
+              <option>Witness</option>
+            </select>
+          </div>
+          <div>
+            <label>Jurisdiction</label>
+            <select id="case-jurisdiction">
+              <option>United Kingdom</option>
+              <option>European Union</option>
+              <option>United States</option>
+              <option>Netherlands</option>
+              <option>Germany</option>
+              <option>France</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-bottom:14px">
+          <label>Describe Your Case Facts</label>
+          <textarea id="case-facts" rows="6" placeholder="Describe what happened, key dates, parties involved, evidence you have, what outcome you want..."></textarea>
+        </div>
+        <button class="btn btn-primary" onclick="buildCase()">⚖️ Build Case Strategy ↗</button>
+        <div id="case-result-box" style="margin-top:16px;display:none">
+          <div class="result-box" id="case-result"></div>
+          <div class="result-actions">
+            <button class="btn btn-ghost btn-sm" onclick="downloadResult('case-result','Case_Strategy')">⬇ Download</button>
+            <button class="btn btn-ghost btn-sm" onclick="saveDoc('case')">💾 Save</button>
+            <button class="btn btn-ghost btn-sm" onclick="readAloud('case-result')">🔊 Read Aloud</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COMPLIANCE SCANNER -->
+    <div class="page" id="page-compliance">
+      <div class="panel">
+        <div class="panel-title">✅ Compliance Scanner</div>
+        <label style="margin-bottom:8px">Select Business Type</label>
+        <div class="biz-types" id="biz-types">
+          <button class="biz-btn active" onclick="selectBiz(this)">Sole Trader</button>
+          <button class="biz-btn" onclick="selectBiz(this)">Limited Company</button>
+          <button class="biz-btn" onclick="selectBiz(this)">Partnership</button>
+          <button class="biz-btn" onclick="selectBiz(this)">E-Commerce</button>
+          <button class="biz-btn" onclick="selectBiz(this)">SaaS / Software</button>
+          <button class="biz-btn" onclick="selectBiz(this)">Healthcare</button>
+          <button class="biz-btn" onclick="selectBiz(this)">Finance</button>
+          <button class="biz-btn" onclick="selectBiz(this)">Non-Profit</button>
+        </div>
+        <div style="margin-bottom:14px">
+          <label>Describe Your Business Activities</label>
+          <textarea id="compliance-desc" rows="5" placeholder="What does your business do? What data do you collect? Which countries do you operate in? What services/products do you sell?"></textarea>
+        </div>
+        <button class="btn btn-primary" onclick="runCompliance()">✅ Run Compliance Scan ↗</button>
+        <div id="compliance-result-box" style="margin-top:16px;display:none">
+          <div class="result-box" id="compliance-result"></div>
+          <div class="result-actions">
+            <button class="btn btn-ghost btn-sm" onclick="downloadResult('compliance-result','Compliance_Report')">⬇ Download</button>
+            <button class="btn btn-ghost btn-sm" onclick="readAloud('compliance-result')">🔊 Read Aloud</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTRACT ANALYZER -->
+    <div class="page" id="page-analyze">
+      <div class="panel">
+        <div class="panel-title">🔍 Contract Analyzer</div>
+        <textarea id="analyze-text" rows="8" placeholder="Paste your contract text here for full AI analysis..."></textarea>
+        <div style="margin-top:10px;display:flex;gap:8px">
+          <button class="btn btn-primary" onclick="runTool('analyze')">🔍 Analyze Contract ↗</button>
+        </div>
+        <div id="analyze-result-box" style="margin-top:16px;display:none">
+          <div class="result-box" id="analyze-result"></div>
+          <div class="result-actions">
+            <button class="btn btn-ghost btn-sm" onclick="downloadResult('analyze-result','Contract_Analysis')">⬇ Download</button>
+            <button class="btn btn-ghost btn-sm" onclick="saveDoc('analyze')">💾 Save</button>
+            <button class="btn btn-ghost btn-sm" onclick="readAloud('analyze-result')">🔊 Read Aloud</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RISK ASSESSMENT -->
+    <div class="page" id="page-risk">
+      <div class="panel">
+        <div class="panel-title">⚠️ Risk Assessment</div>
+        <textarea id="risk-text" rows="8" placeholder="Paste contract or document text here..."></textarea>
+        <div style="margin-top:10px"><button class="btn btn-primary" onclick="runTool('risk')">⚠️ Assess Risks ↗</button></div>
+        <div id="risk-result-box" style="margin-top:16px;display:none">
+          <div class="result-box" id="risk-result"></div>
+          <div class="result-actions">
+            <button class="btn btn-ghost btn-sm" onclick="downloadResult('risk-result','Risk_Assessment')">⬇ Download</button>
+            <button class="btn btn-ghost btn-sm" onclick="readAloud('risk-result')">🔊 Read Aloud</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EXTRACT DEADLINES -->
+    <div class="page" id="page-deadlines">
+      <div class="panel">
+        <div class="panel-title">📅 Extract Deadlines</div>
+        <textarea id="deadlines-text" rows="8" placeholder="Paste contract or document text here..."></textarea>
+        <div style="margin-top:10px"><button class="btn btn-primary" onclick="runTool('deadlines')">📅 Extract Deadlines ↗</button></div>
+        <div id="deadlines-result-box" style="margin-top:16px;display:none">
+          <div class="result-box" id="deadlines-result"></div>
+          <div class="result-actions">
+            <button class="btn btn-ghost btn-sm" onclick="downloadResult('deadlines-result','Deadlines')">⬇ Download</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- IDENTIFY PARTIES -->
+    <div class="page" id="page-parties">
+      <div class="panel">
+        <div class="panel-title">👥 Identify Parties</div>
+        <textarea id="parties-text" rows="8" placeholder="Paste contract or document text here..."></textarea>
+        <div style="margin-top:10px"><button class="btn btn-primary" onclick="runTool('parties')">👥 Identify Parties ↗</button></div>
+        <div id="parties-result-box" style="margin-top:16px;display:none">
+          <div class="result-box" id="parties-result"></div>
+          <div class="result-actions">
+            <button class="btn btn-ghost btn-sm" onclick="downloadResult('parties-result','Parties')">⬇ Download</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TEMPLATES -->
+    <div class="page" id="page-templates">
+      <div class="panel">
+        <div class="panel-title">📋 500+ Legal Templates</div>
+        <input type="text" id="tmpl-search" placeholder="Search templates..." oninput="filterTemplates()" style="margin-bottom:14px"/>
+        <div class="tmpl-grid" id="tmpl-grid"></div>
+      </div>
+    </div>
+
+    <!-- VOICE WRITER -->
+    <div class="page" id="page-voicewriter">
+      <div class="panel">
+        <div class="panel-title">🎤 Voice Writer</div>
+        <div style="text-align:center;padding:20px 0">
+          <button class="voice-btn idle" id="voice-btn" onclick="toggleVoice()">🎤</button>
+          <div style="margin-top:10px;font-size:12px;color:var(--muted)" id="voice-status">Click to start recording</div>
+        </div>
+        <label>Transcribed Text</label>
+        <textarea id="voice-text" rows="6" placeholder="Your speech will appear here in real time..."></textarea>
+        <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-primary btn-sm" onclick="sendVoiceToChat()">💬 Send to Chat</button>
+          <button class="btn btn-ghost btn-sm" onclick="sendVoiceToDoc()">📄 Send to Doc Generator</button>
+          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('voice-text').value=''">🗑 Clear</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- VOICE READER -->
+    <div class="page" id="page-voicereader">
+      <div class="panel">
+        <div class="panel-title">🔊 Voice Reader</div>
+        <div style="margin-bottom:14px">
+          <label>Language</label>
+          <select id="reader-lang">
+            <option value="en-GB">English (UK)</option>
+            <option value="en-US">English (US)</option>
+            <option value="de-DE">Deutsch</option>
+            <option value="fr-FR">Français</option>
+            <option value="nl-NL">Nederlands</option>
+            <option value="es-ES">Español</option>
+            <option value="it-IT">Italiano</option>
+            <option value="pt-PT">Português</option>
+          </select>
+        </div>
+        <label>Text to Read</label>
+        <textarea id="reader-text" rows="8" placeholder="Paste any legal text here and press Play..."></textarea>
+        <div style="margin-top:12px;display:flex;gap:8px">
+          <button class="btn btn-primary" onclick="startReading()">🔊 Play</button>
+          <button class="btn btn-ghost" onclick="stopReading()">⏹ Stop</button>
+          <button class="btn btn-ghost" onclick="pauseReading()">⏸ Pause</button>
+        </div>
+        <div id="reader-status" style="margin-top:8px;font-size:12px;color:var(--muted)"></div>
+      </div>
+    </div>
+
+    <!-- SAVED DOCS -->
+    <div class="page" id="page-saved">
+      <div class="panel">
+        <div class="panel-title">💾 Saved Documents</div>
+        <div id="saved-list"></div>
+        <div id="saved-empty" style="text-align:center;padding:30px;color:var(--muted);font-size:13px">No saved documents yet. Generate documents and save them here.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<script>
+const API = 'https://nnit-legal-ai-production.up.railway.app/api/legal-ai'
+
+// ── NAV ──
+function gotoPage(id,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'))
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'))
+  document.getElementById('page-'+id).classList.add('active')
+  if(el) el.classList.add('active')
+  const titles={dashboard:'🏠 Dashboard',chat:'💬 AI Legal Chat',upload:'📎 Upload Documents',camera:'📷 Camera Scanner',docgen:'📄 Document Generator',case:'⚖️ Case Builder',compliance:'✅ Compliance Scanner',analyze:'🔍 Contract Analyzer',risk:'⚠️ Risk Assessment',deadlines:'📅 Extract Deadlines',parties:'👥 Identify Parties',templates:'📋 Templates',voicewriter:'🎤 Voice Writer',voicereader:'🔊 Voice Reader',saved:'💾 Saved Documents'}
+  document.getElementById('topbar-title').textContent = titles[id]||id
+  if(id==='templates') renderTemplates()
+  if(id==='saved') renderSaved()
+}
+function gotoPageById(id,title){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'))
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'))
+  document.getElementById('page-'+id).classList.add('active')
+  document.getElementById('topbar-title').textContent = title
+  if(id==='templates') renderTemplates()
+}
+
+// ── API CALL ──
+async function callAI(messages, systemPrompt){
+  const res = await fetch(API, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({messages, systemPrompt, max_tokens:1500})
+  })
+  const data = await res.json()
+  if(data.error) throw new Error(data.error)
+  return data.result
+}
+
+function loading(){return '<span class="loading"><span></span><span></span><span></span></span> Thinking...'}
+
+// ── CHAT ──
+let chatHistory=[]
+async function sendChat(){
+  const inp = document.getElementById('chat-input')
+  const text = inp.value.trim()
+  if(!text) return
+  inp.value=''
+  addMsg(text,'user')
+  chatHistory.push({role:'user',content:text})
+  const aiDiv = addMsg(loading(),'ai')
+  try{
+    const reply = await callAI(chatHistory,'You are NNIT Legal AI, a professional legal assistant. Provide clear, thorough legal information. Always add a note that AI advice is informational only.')
+    aiDiv.innerHTML = '<div class="msg-label">NNIT Legal AI</div>'+reply
+    chatHistory.push({role:'assistant',content:reply})
+  }catch(e){aiDiv.innerHTML='<div class="msg-label">NNIT Legal AI</div>Error: '+e.message}
+}
+function quickChat(q){document.getElementById('chat-input').value=q;sendChat()}
+function addMsg(html,role){
+  const box=document.getElementById('chat-messages')
+  const d=document.createElement('div')
+  d.className='msg '+role
+  if(role==='ai') d.innerHTML='<div class="msg-label">NNIT Legal AI</div>'+html
+  else d.textContent=html
+  box.appendChild(d)
+  box.scrollTop=box.scrollHeight
+  return d
+}
+
+// ── UPLOAD ──
+function handleDrop(e){e.preventDefault();document.getElementById('dropzone').classList.remove('drag');const f=e.dataTransfer.files[0];if(f) readFile(f)}
+function handleFile(inp){if(inp.files[0]) readFile(inp.files[0])}
+function readFile(f){
+  const r=new FileReader()
+  r.onload=e=>{
+    document.getElementById('file-text').value=e.target.result
+    document.getElementById('file-content').style.display='block'
+  }
+  r.readAsText(f)
+}
+async function analyzeUpload(type){
+  const text=document.getElementById('file-text').value.trim()
+  if(!text) return
+  const box=document.getElementById('upload-result')
+  box.style.display='block'
+  box.innerHTML=loading()
+  try{
+    const prompts={analyze:'Analyze this contract thoroughly. Identify key clauses, obligations, rights, and any concerns.',risk:'Identify all legal risks in this document. Rate each as High/Medium/Low and explain.',deadlines:'Extract all dates, deadlines, notice periods, and time-sensitive obligations.',parties:'Identify all parties, their roles, obligations, and rights in this document.'}
+    const result=await callAI([{role:'user',content:prompts[type]+'\n\n'+text}])
+    box.textContent=result
+  }catch(e){box.textContent='Error: '+e.message}
+}
+
+// ── CAMERA ──
+let camStream=null, facingMode='environment'
+async function startCamera(){
+  try{
+    camStream=await navigator.mediaDevices.getUserMedia({video:{facingMode}})
+    document.getElementById('camera-video').srcObject=camStream
+    document.getElementById('cam-start-btn').style.display='none'
+    document.getElementById('cam-capture-btn').style.display='inline-flex'
+    document.getElementById('cam-switch-btn').style.display='inline-flex'
+    document.getElementById('cam-stop-btn').style.display='inline-flex'
+  }catch(e){alert('Camera error: '+e.message)}
+}
+function capturePhoto(){
+  const v=document.getElementById('camera-video')
+  const c=document.getElementById('camera-canvas')
+  c.width=v.videoWidth;c.height=v.videoHeight
+  c.getContext('2d').drawImage(v,0,0)
+  const img=document.getElementById('captured-img')
+  img.src=c.toDataURL('image/jpeg')
+  document.getElementById('camera-result').style.display='block'
+  document.getElementById('camera-text').value='Image captured. Click Analyze Document to extract and analyze text using AI.'
+}
+function switchCamera(){
+  facingMode=facingMode==='environment'?'user':'environment'
+  stopCamera();startCamera()
+}
+function stopCamera(){
+  if(camStream) camStream.getTracks().forEach(t=>t.stop())
+  document.getElementById('camera-video').srcObject=null
+  document.getElementById('cam-start-btn').style.display='inline-flex'
+  document.getElementById('cam-capture-btn').style.display='none'
+  document.getElementById('cam-switch-btn').style.display='none'
+  document.getElementById('cam-stop-btn').style.display='none'
+}
+async function analyzeCamera(type){
+  const text=document.getElementById('camera-text').value.trim()
+  const box=document.getElementById('camera-ai-result')
+  box.style.display='block'
+  box.innerHTML=loading()
+  try{
+    const prompts={analyze:'The user scanned a physical document. Analyze it as a legal document. Identify key clauses, obligations, and concerns.',risk:'The user scanned a physical document. Identify all legal risks.',deadlines:'The user scanned a physical document. Extract all dates and deadlines.'}
+    const result=await callAI([{role:'user',content:prompts[type]+'\n\nDocument description: '+text}])
+    box.textContent=result
+  }catch(e){box.textContent='Error: '+e.message}
+}
+
+// ── DOC GENERATOR ──
+async function generateDocument(){
+  const type=document.getElementById('doc-type').value
+  const biz=document.getElementById('doc-biz-type').value
+  const p1=document.getElementById('doc-party1').value
+  const p2=document.getElementById('doc-party2').value
+  const details=document.getElementById('doc-details').value
+  const box=document.getElementById('doc-result')
+  const wrap=document.getElementById('doc-result-box')
+  wrap.style.display='block'
+  box.innerHTML=loading()
+  try{
+    const prompt=`Generate a professional ${type} for a ${biz} business.\nParty 1: ${p1||'Party A'}\nParty 2: ${p2||'Party B'}\nDetails: ${details}\n\nCreate a complete, formal legal document with all standard clauses. Format with clear sections and headings.`
+    const result=await callAI([{role:'user',content:prompt}],'You are a professional legal document drafter. Create complete, formal legal documents.')
+    box.textContent=result
+  }catch(e){box.textContent='Error: '+e.message}
+}
+
+// ── CASE BUILDER ──
+async function buildCase(){
+  const type=document.getElementById('case-type').value
+  const pos=document.getElementById('case-position').value
+  const jur=document.getElementById('case-jurisdiction').value
+  const facts=document.getElementById('case-facts').value.trim()
+  if(!facts){alert('Please describe your case facts');return}
+  const box=document.getElementById('case-result')
+  const wrap=document.getElementById('case-result-box')
+  wrap.style.display='block'
+  box.innerHTML=loading()
+  try{
+    const prompt=`Case Type: ${type}\nMy Position: ${pos}\nJurisdiction: ${jur}\nFacts: ${facts}\n\nBuild a comprehensive legal case strategy including: 1) Case assessment 2) Legal arguments 3) Evidence needed 4) Potential defences 5) Recommended next steps 6) Risk assessment`
+    const result=await callAI([{role:'user',content:prompt}],'You are an expert legal strategist. Build comprehensive case strategies.')
+    box.textContent=result
+  }catch(e){box.textContent='Error: '+e.message}
+}
+
+// ── COMPLIANCE ──
+let selectedBiz='Sole Trader'
+function selectBiz(el){
+  document.querySelectorAll('.biz-btn').forEach(b=>b.classList.remove('active'))
+  el.classList.add('active')
+  selectedBiz=el.textContent
+}
+async function runCompliance(){
+  const desc=document.getElementById('compliance-desc').value.trim()
+  if(!desc){alert('Please describe your business activities');return}
+  const box=document.getElementById('compliance-result')
+  const wrap=document.getElementById('compliance-result-box')
+  wrap.style.display='block'
+  box.innerHTML=loading()
+  try{
+    const prompt=`Business Type: ${selectedBiz}\nBusiness Activities: ${desc}\n\nProvide a comprehensive compliance scan including: 1) GDPR compliance requirements 2) Industry-specific regulations 3) Required licenses/registrations 4) Employment law obligations 5) Tax compliance 6) Data protection requirements 7) Risk areas 8) Action items prioritized by urgency`
+    const result=await callAI([{role:'user',content:prompt}],'You are a compliance expert. Provide thorough compliance assessments.')
+    box.textContent=result
+  }catch(e){box.textContent='Error: '+e.message}
+}
+
+// ── TOOLS (analyze, risk, deadlines, parties) ──
+async function runTool(type){
+  const text=document.getElementById(type+'-text').value.trim()
+  if(!text){alert('Please paste document text');return}
+  const box=document.getElementById(type+'-result')
+  const wrap=document.getElementById(type+'-result-box')
+  wrap.style.display='block'
+  box.innerHTML=loading()
+  try{
+    const prompts={
+      analyze:'Analyze this contract thoroughly. Cover: key clauses, obligations for each party, rights granted, termination conditions, liability provisions, payment terms, IP ownership, and any red flags.',
+      risk:'Identify all legal risks in this document. For each risk: name it, rate it (High/Medium/Low), explain the concern, and suggest mitigation.',
+      deadlines:'Extract ALL dates, deadlines, notice periods, renewal dates, payment schedules, and any time-sensitive obligations. Format as a clear list.',
+      parties:'Identify all parties in this document. For each party: their name/description, role, key obligations, rights, and liabilities.'
+    }
+    const result=await callAI([{role:'user',content:prompts[type]+'\n\n'+text}])
+    box.textContent=result
+  }catch(e){box.textContent='Error: '+e.message}
+}
+
+// ── TEMPLATES ──
+const TEMPLATES=[
+  {icon:'📝',name:'NDA (Mutual)',cat:'Contracts'},{icon:'📝',name:'NDA (One-Way)',cat:'Contracts'},
+  {icon:'💼',name:'Employment Contract',cat:'Employment'},{icon:'💼',name:'Freelance Agreement',cat:'Employment'},
+  {icon:'💼',name:'Contractor Agreement',cat:'Employment'},{icon:'💼',name:'Non-Compete Clause',cat:'Employment'},
+  {icon:'🏢',name:'Service Agreement',cat:'Business'},{icon:'🏢',name:'Partnership Agreement',cat:'Business'},
+  {icon:'🏢',name:'Shareholder Agreement',cat:'Business'},{icon:'🏢',name:'Joint Venture Agreement',cat:'Business'},
+  {icon:'🔒',name:'Privacy Policy (GDPR)',cat:'Compliance'},{icon:'🔒',name:'Terms of Service',cat:'Compliance'},
+  {icon:'🔒',name:'Cookie Policy',cat:'Compliance'},{icon:'🔒',name:'Data Processing Agreement',cat:'Compliance'},
+  {icon:'🏠',name:'Residential Lease',cat:'Property'},{icon:'🏠',name:'Commercial Lease',cat:'Property'},
+  {icon:'🏠',name:'Sublease Agreement',cat:'Property'},{icon:'🏠',name:'Property Purchase Agreement',cat:'Property'},
+  {icon:'✉️',name:'Cease & Desist Letter',cat:'Letters'},{icon:'✉️',name:'Demand Letter',cat:'Letters'},
+  {icon:'✉️',name:'Letter of Intent',cat:'Letters'},{icon:'✉️',name:'Settlement Offer',cat:'Letters'},
+  {icon:'💳',name:'Invoice Terms',cat:'Finance'},{icon:'💳',name:'Loan Agreement',cat:'Finance'},
+  {icon:'💳',name:'Payment Plan Agreement',cat:'Finance'},{icon:'💳',name:'Debt Settlement',cat:'Finance'},
+  {icon:'🌐',name:'SaaS Agreement',cat:'Tech'},{icon:'🌐',name:'Software License',cat:'Tech'},
+  {icon:'🌐',name:'API Terms of Use',cat:'Tech'},{icon:'🌐',name:'Website Development Contract',cat:'Tech'},
+  {icon:'⚖️',name:'Settlement Agreement',cat:'Dispute'},{icon:'⚖️',name:'Mediation Agreement',cat:'Dispute'},
+  {icon:'🤝',name:'Consulting Agreement',cat:'Business'},{icon:'🤝',name:'Agency Agreement',cat:'Business'},
+  {icon:'📦',name:'Supply Agreement',cat:'Business'},{icon:'📦',name:'Distribution Agreement',cat:'Business'},
+]
+function renderTemplates(){
+  const q=(document.getElementById('tmpl-search')||{value:''}).value.toLowerCase()
+  const grid=document.getElementById('tmpl-grid')
+  const filtered=TEMPLATES.filter(t=>t.name.toLowerCase().includes(q)||t.cat.toLowerCase().includes(q))
+  grid.innerHTML=filtered.map(t=>`<div class="tmpl-card" onclick="useTemplate('${t.name}')"><div class="t-icon">${t.icon}</div><div class="t-name">${t.name}</div><div class="t-cat">${t.cat}</div></div>`).join('')
+}
+function filterTemplates(){renderTemplates()}
+function useTemplate(name){
+  document.getElementById('doc-type').value=name
+  gotoPageById('docgen','📄 Document Generator')
+}
+
+// ── VOICE WRITER ──
+let recognition=null, isRecording=false
+function toggleVoice(){
+  if(!('webkitSpeechRecognition' in window||'SpeechRecognition' in window)){alert('Voice recognition not supported in this browser. Try Chrome.');return}
+  if(isRecording) stopVoice()
+  else startVoice()
+}
+function startVoice(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition
+  recognition=new SR()
+  recognition.continuous=true;recognition.interimResults=true;recognition.lang='en-GB'
+  recognition.onresult=e=>{
+    let final='',interim=''
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      if(e.results[i].isFinal) final+=e.results[i][0].transcript
+      else interim+=e.results[i][0].transcript
+    }
+    const ta=document.getElementById('voice-text')
+    if(final) ta.value+=(ta.value?' ':'')+final
+  }
+  recognition.onerror=e=>{document.getElementById('voice-status').textContent='Error: '+e.error;stopVoice()}
+  recognition.start()
+  isRecording=true
+  const btn=document.getElementById('voice-btn')
+  btn.className='voice-btn recording';btn.textContent='⏹'
+  document.getElementById('voice-status').textContent='Recording... speak now'
+}
+function stopVoice(){
+  if(recognition) recognition.stop()
+  isRecording=false
+  const btn=document.getElementById('voice-btn')
+  btn.className='voice-btn idle';btn.textContent='🎤'
+  document.getElementById('voice-status').textContent='Click to start recording'
+}
+function sendVoiceToChat(){
+  const t=document.getElementById('voice-text').value.trim()
+  if(!t) return
+  document.getElementById('chat-input').value=t
+  gotoPageById('chat','💬 AI Legal Chat')
+  sendChat()
+}
+function sendVoiceToDoc(){
+  const t=document.getElementById('voice-text').value.trim()
+  if(!t) return
+  document.getElementById('doc-details').value=t
+  gotoPageById('docgen','📄 Document Generator')
+}
+
+// ── VOICE READER ──
+let utterance=null
+function startReading(){
+  const text=document.getElementById('reader-text').value.trim()
+  if(!text){alert('Please paste text to read');return}
+  window.speechSynthesis.cancel()
+  utterance=new SpeechSynthesisUtterance(text)
+  utterance.lang=document.getElementById('reader-lang').value
+  utterance.rate=0.9
+  utterance.onstart=()=>document.getElementById('reader-status').textContent='▶ Reading...'
+  utterance.onend=()=>document.getElementById('reader-status').textContent='✓ Done'
+  window.speechSynthesis.speak(utterance)
+}
+function stopReading(){window.speechSynthesis.cancel();document.getElementById('reader-status').textContent='⏹ Stopped'}
+function pauseReading(){
+  if(window.speechSynthesis.paused) window.speechSynthesis.resume()
+  else window.speechSynthesis.pause()
+}
+function readAloud(id){
+  const text=document.getElementById(id).textContent.trim()
+  if(!text) return
+  window.speechSynthesis.cancel()
+  const u=new SpeechSynthesisUtterance(text)
+  u.lang='en-GB';u.rate=0.9
+  window.speechSynthesis.speak(u)
+}
+
+// ── SAVED DOCS ──
+function saveDoc(source){
+  const sources={docgen:'doc-result',case:'case-result',analyze:'analyze-result'}
+  const id=sources[source]||source
+  const text=document.getElementById(id)?.textContent?.trim()
+  if(!text) return
+  const docs=JSON.parse(localStorage.getItem('nnit-legal-docs')||'[]')
+  docs.unshift({id:Date.now(),title:(document.getElementById('doc-type')?.value||'Legal Document')+' — '+new Date().toLocaleDateString(),content:text,date:new Date().toISOString()})
+  localStorage.setItem('nnit-legal-docs',JSON.stringify(docs))
+  alert('Document saved!')
+}
+function renderSaved(){
+  const docs=JSON.parse(localStorage.getItem('nnit-legal-docs')||'[]')
+  const list=document.getElementById('saved-list')
+  const empty=document.getElementById('saved-empty')
+  if(!docs.length){list.innerHTML='';empty.style.display='block';return}
+  empty.style.display='none'
+  list.innerHTML=docs.map(d=>`<div class="doc-row"><span class="doc-name">📄 ${d.title}</span><span class="doc-date">${new Date(d.date).toLocaleDateString()}</span><button class="btn btn-ghost btn-sm" onclick="viewSaved(${d.id})">View</button><button class="btn btn-danger btn-sm" onclick="deleteDoc(${d.id})">Delete</button></div>`).join('')
+}
+function viewSaved(id){
+  const docs=JSON.parse(localStorage.getItem('nnit-legal-docs')||'[]')
+  const doc=docs.find(d=>d.id===id)
+  if(!doc) return
+  alert(doc.content.substring(0,500)+'...')
+}
+function deleteDoc(id){
+  if(!confirm('Delete this document?')) return
+  let docs=JSON.parse(localStorage.getItem('nnit-legal-docs')||'[]')
+  docs=docs.filter(d=>d.id!==id)
+  localStorage.setItem('nnit-legal-docs',JSON.stringify(docs))
+  renderSaved()
+}
+
+// ── DOWNLOAD ──
+function downloadResult(id,name){
+  const text=document.getElementById(id).textContent
+  const blob=new Blob([text],{type:'text/plain'})
+  const a=document.createElement('a')
+  a.href=URL.createObjectURL(blob)
+  a.download=name+'_'+Date.now()+'.txt'
+  a.click()
+}
+function downloadDoc(){downloadResult('doc-result',document.getElementById('doc-type').value.replace(/\s+/g,'_'))}
+
+// INIT
+renderTemplates()
+</script>
+</body>
+</html> 

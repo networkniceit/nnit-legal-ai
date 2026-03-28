@@ -1,1 +1,1 @@
-{"rewrites":[{"source":"/","destination":"/nnit-legal-ai.html"},{"source":"/(.*)", "destination":"/nnit-legal-ai.html"}]}
+{"rewrites":[{"source":"/(.*)", "destination":"/index.html"}]}

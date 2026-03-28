@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import LegalChat from "./pages/LegalChat";
@@ -6,7 +6,7 @@ import ContractAnalyzer from "./pages/ContractAnalyzer";
 import DocumentGenerator from "./pages/DocumentGenerator";
 import CaseBuilder from "./pages/CaseBuilder";
 import Compliance from "./pages/Compliance";
-
+import SavedDocs from "./pages/SavedDocs";
 export default function App() {
   return (
     <BrowserRouter>
@@ -17,6 +17,7 @@ export default function App() {
         <Route path="/documents" element={<DocumentGenerator />} />
         <Route path="/case" element={<CaseBuilder />} />
         <Route path="/compliance" element={<Compliance />} />
+        <Route path="/saved" element={<SavedDocs />} />
       </Routes>
     </BrowserRouter>
   );

@@ -1,6 +1,5 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-
 export default function Home() {
   const navigate = useNavigate();
   const services = [
@@ -8,25 +7,19 @@ export default function Home() {
     { title: "Contract Analyzer", desc: "Upload contracts and get AI risk analysis", path: "/contract", color: "#28a745", icon: "DOC" },
     { title: "Document Generator", desc: "Generate NDAs, contracts, legal letters instantly", path: "/documents", color: "#fd7e14", icon: "GEN" },
     { title: "Case Builder", desc: "Build your legal case with AI strategy", path: "/case", color: "#dc3545", icon: "CASE" },
-    { title: "Compliance Scanner", desc: "Check your business compliance with AI", path: "/compliance", color: "#17a2b8", icon: "SCAN" }
+    { title: "Compliance Scanner", desc: "Check your business compliance with AI", path: "/compliance", color: "#17a2b8", icon: "SCAN" },
+    { title: "Saved Documents", desc: "View, edit and delete your saved legal documents", path: "/saved", color: "#764ba2", icon: "SAVE" }
   ];
   return (
     <div style={{ minHeight: "100vh", background: "#0a0a1a", color: "white" }}>
       <div style={{ background: "linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)", padding: "60px 20px", textAlign: "center" }}>
         <div style={{ fontSize: "48px", marginBottom: "15px" }}>LEGAL</div>
-        <h1 style={{ fontSize: "42px", margin: "0 0 15px 0", background: "linear-gradient(135deg, #667eea, #764ba2)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-          NNIT AI Legal Assistant
-        </h1>
-        <p style={{ fontSize: "18px", color: "#aaa", marginBottom: "30px", maxWidth: "600px", margin: "0 auto 30px" }}>
-          Professional AI-powered legal assistance for contracts, cases, compliance and more
-        </p>
+        <h1 style={{ fontSize: "42px", margin: "0 0 15px 0", background: "linear-gradient(135deg, #667eea, #764ba2)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>NNIT AI Legal Assistant</h1>
+        <p style={{ fontSize: "18px", color: "#aaa", marginBottom: "30px", maxWidth: "600px", margin: "0 auto 30px" }}>Professional AI-powered legal assistance for contracts, cases, compliance and more</p>
         <div style={{ display: "flex", gap: "15px", justifyContent: "center", flexWrap: "wrap", marginBottom: "20px" }}>
-          <button onClick={() => navigate("/chat")} style={{ padding: "16px 40px", background: "linear-gradient(135deg, #667eea, #764ba2)", color: "white", border: "none", borderRadius: "30px", fontSize: "18px", fontWeight: "bold", cursor: "pointer" }}>
-            Ask Legal AI
-          </button>
-          <button onClick={() => navigate("/documents")} style={{ padding: "16px 40px", background: "transparent", color: "white", border: "2px solid #667eea", borderRadius: "30px", fontSize: "18px", fontWeight: "bold", cursor: "pointer" }}>
-            Generate Document
-          </button>
+          <button onClick={() => navigate("/chat")} style={{ padding: "16px 40px", background: "linear-gradient(135deg, #667eea, #764ba2)", color: "white", border: "none", borderRadius: "30px", fontSize: "18px", fontWeight: "bold", cursor: "pointer" }}>Ask Legal AI</button>
+          <button onClick={() => navigate("/documents")} style={{ padding: "16px 40px", background: "transparent", color: "white", border: "2px solid #667eea", borderRadius: "30px", fontSize: "18px", fontWeight: "bold", cursor: "pointer" }}>Generate Document</button>
+          <button onClick={() => navigate("/saved")} style={{ padding: "16px 40px", background: "transparent", color: "white", border: "2px solid #764ba2", borderRadius: "30px", fontSize: "18px", fontWeight: "bold", cursor: "pointer" }}>Saved Documents</button>
         </div>
         <div style={{ display: "flex", gap: "20px", justifyContent: "center", flexWrap: "wrap", marginTop: "40px" }}>
           {["500+ Legal Templates", "GPT-4 Powered", "12 Languages", "GDPR Compliant"].map((f, i) => (

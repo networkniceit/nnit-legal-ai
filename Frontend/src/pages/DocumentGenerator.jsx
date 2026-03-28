@@ -13,6 +13,13 @@ const docTypes = [
   { id: "terms", name: "Terms of Service", fields: ["Company Name", "Service Description", "Governing Law", "Contact Email"] }
 ];
 
+const saveDoc = (title, content) => {
+  const docs = JSON.parse(localStorage.getItem("nnit_saved_docs") || "[]");
+  docs.unshift({ id: Date.now(), title, content, created: new Date().toLocaleString() });
+  localStorage.setItem("nnit_saved_docs", JSON.stringify(docs));
+  alert("Document saved!");
+};
+
 export default function DocumentGenerator() {
   const navigate = useNavigate();
   const [selectedDoc, setSelectedDoc] = useState(null);
@@ -76,11 +83,12 @@ export default function DocumentGenerator() {
             {generated && (
               <div style={{ background: "#1a1a2e", borderRadius: "12px", padding: "25px", border: "1px solid #fd7e14" }}>
                 <h3 style={{ color: "#fd7e14", marginBottom: "15px" }}>Generated Document</h3>
-                <div style={{ background: "#0a0a1a", padding: "20px", borderRadius: "8px", maxHeight: "600px", overflowY: "auto" }}>
+                <div style={{ background: "#0a0a1a", padding: "20px", borderRadius: "8px", maxHeight: "500px", overflowY: "auto" }}>
                   <pre style={{ whiteSpace: "pre-wrap", color: "#e0e0e0", fontSize: "13px", lineHeight: "1.8", fontFamily: "inherit", margin: 0 }}>{generated}</pre>
                 </div>
                 <div style={{ display: "flex", gap: "10px", marginTop: "15px" }}>
-                  <button onClick={() => navigator.clipboard.writeText(generated)} style={{ flex: 1, padding: "10px", background: "#333", color: "white", border: "none", borderRadius: "6px", cursor: "pointer" }}>Copy Document</button>
+                  <button onClick={() => saveDoc(selectedDoc.name, generated)} style={{ flex: 1, padding: "10px", background: "#764ba2", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "bold" }}>Save Document</button>
+                  <button onClick={() => navigator.clipboard.writeText(generated)} style={{ flex: 1, padding: "10px", background: "#333", color: "white", border: "none", borderRadius: "6px", cursor: "pointer" }}>Copy</button>
                   <button onClick={() => { const blob = new Blob([generated], {type: "text/plain"}); const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = selectedDoc.id + ".txt"; a.click(); }} style={{ flex: 1, padding: "10px", background: "#fd7e14", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "bold" }}>Download</button>
                 </div>
               </div>

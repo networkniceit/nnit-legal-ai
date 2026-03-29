@@ -6,6 +6,7 @@
 <title>NNIT Legal AI — Professional Legal Assistant</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
 <script src="https://meet.jit.si/external_api.js" async></script>
+<script src="https://js.stripe.com/v3/"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
@@ -204,6 +205,11 @@ label{font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:upperca
     <div class="nav-item" onclick="gotoPage('voicereader',this)"><span class="icon">🔊</span> Voice Reader</div>
   </div>
   <div class="nav-section">
+    <div class="nav-label">💳 Payments & Portal</div>
+    <div class="nav-item" onclick="gotoPage('payments',this)"><span class="icon">💳</span> Book Consultation</div>
+    <div class="nav-item" onclick="gotoPage('portal',this)"><span class="icon">👤</span> Client Portal</div>
+  </div>
+  <div class="nav-section">
     <div class="nav-label">My Docs</div>
     <div class="nav-item" onclick="gotoPage('saved',this)"><span class="icon">💾</span> Saved Documents</div>
   </div>
@@ -222,6 +228,20 @@ label{font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:upperca
     <div class="page-title" id="topbar-title">🏠 Dashboard</div>
     <div class="topbar-right">
       <div class="bio-chip locked" id="bio-status-chip" onclick="showBioModal()">🔒 Secure Login</div>
+      <select id="lang-select" onchange="changeLang(this.value)" style="background:var(--panel);border:1px solid var(--border);color:var(--text);padding:5px 8px;border-radius:6px;font-size:11px;cursor:pointer">
+        <option value="en">🇬🇧 English</option>
+        <option value="de">🇩🇪 Deutsch</option>
+        <option value="nl">🇳🇱 Nederlands</option>
+        <option value="fr">🇫🇷 Français</option>
+        <option value="es">🇪🇸 Español</option>
+        <option value="it">🇮🇹 Italiano</option>
+        <option value="pt">🇵🇹 Português</option>
+        <option value="ar">🇸🇦 العربية</option>
+        <option value="zh">🇨🇳 中文</option>
+        <option value="ja">🇯🇵 日本語</option>
+        <option value="ko">🇰🇷 한국어</option>
+        <option value="ru">🇷🇺 Русский</option>
+      </select>
       <div class="user-chip">Solomon · NNIT</div>
     </div>
   </div>
@@ -700,6 +720,116 @@ label{font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:upperca
         <div class="panel-title">💾 Saved Documents</div>
         <div id="saved-list"></div>
         <div id="saved-empty" style="text-align:center;padding:30px;color:var(--muted);font-size:13px">No saved documents yet.</div>
+      </div>
+    </div>
+
+    <!-- PAYMENTS -->
+    <div class="page" id="page-payments">
+      <div class="panel">
+        <div class="panel-title">💳 Book a Consultation</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:20px">Choose a consultation type and pay securely via Stripe. You will receive a meeting link by email after payment.</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-bottom:20px">
+          <div class="card" onclick="selectPlan('30min',50)" id="plan-30min">
+            <div class="c-icon">⏱️</div>
+            <div class="c-title">30 Minute Consultation</div>
+            <div style="font-size:20px;font-weight:800;color:var(--accent);margin:8px 0">€50</div>
+            <div class="c-desc">Quick legal advice, document review, or Q&A session</div>
+          </div>
+          <div class="card" onclick="selectPlan('1hour',99)" id="plan-1hour">
+            <div class="c-icon">📋</div>
+            <div class="c-title">1 Hour Consultation</div>
+            <div style="font-size:20px;font-weight:800;color:var(--accent);margin:8px 0">€99</div>
+            <div class="c-desc">In-depth legal consultation on any matter</div>
+          </div>
+          <div class="card" onclick="selectPlan('contract-review',149)" id="plan-contract-review">
+            <div class="c-icon">🔍</div>
+            <div class="c-title">Contract Review</div>
+            <div style="font-size:20px;font-weight:800;color:var(--accent);margin:8px 0">€149</div>
+            <div class="c-desc">Full contract analysis, risk identification & recommendations</div>
+          </div>
+          <div class="card" onclick="selectPlan('2hour',179)" id="plan-2hour">
+            <div class="c-icon">⚖️</div>
+            <div class="c-title">2 Hour Consultation</div>
+            <div style="font-size:20px;font-weight:800;color:var(--accent);margin:8px 0">€179</div>
+            <div class="c-desc">Extended session for complex legal matters</div>
+          </div>
+          <div class="card" onclick="selectPlan('case-strategy',249)" id="plan-case-strategy">
+            <div class="c-icon">🏆</div>
+            <div class="c-title">Full Case Strategy</div>
+            <div style="font-size:20px;font-weight:800;color:var(--gold);margin:8px 0">€249</div>
+            <div class="c-desc">Complete case analysis, strategy, and action plan</div>
+            <div class="c-badge">PREMIUM</div>
+          </div>
+        </div>
+        <div id="payment-form" style="display:none">
+          <div style="background:var(--bg);border:1px solid var(--accent);border-radius:10px;padding:20px;margin-bottom:16px">
+            <div class="panel-title" style="font-size:13px">Selected: <span id="selected-plan-label" style="color:var(--accent)"></span></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+            <div><label>Your Full Name</label><input type="text" id="pay-name" placeholder="John Smith"/></div>
+            <div><label>Your Email</label><input type="email" id="pay-email" placeholder="john@example.com"/></div>
+          </div>
+          <div style="margin-bottom:14px">
+            <label>Preferred Meeting Date</label>
+            <input type="date" id="pay-date"/>
+          </div>
+          <div style="margin-bottom:14px">
+            <label>What do you need help with?</label>
+            <textarea id="pay-notes" rows="3" placeholder="Briefly describe your legal issue or question..."></textarea>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-primary" onclick="processPayment()">💳 Pay Securely with Stripe</button>
+            <button class="btn btn-ghost" onclick="document.getElementById('payment-form').style.display='none'">Cancel</button>
+          </div>
+          <div style="margin-top:10px;font-size:11px;color:var(--muted)">🔒 Secured by Stripe · Your card details are never stored on our servers</div>
+        </div>
+        <div id="payment-success" style="display:none;text-align:center;padding:30px">
+          <div style="font-size:48px;margin-bottom:16px">✅</div>
+          <h3 style="font-family:'Syne',sans-serif;margin-bottom:8px">Payment Successful!</h3>
+          <p style="color:var(--muted);font-size:13px">You will receive a meeting link at your email shortly. Check your inbox.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CLIENT PORTAL -->
+    <div class="page" id="page-portal">
+      <div class="panel">
+        <div class="panel-title">👤 Client Portal</div>
+        <!-- Login/Register -->
+        <div id="portal-auth" style="max-width:400px;margin:0 auto">
+          <div style="display:flex;gap:8px;margin-bottom:20px">
+            <button class="btn btn-primary btn-sm" id="tab-login" onclick="switchPortalTab('login')">Login</button>
+            <button class="btn btn-ghost btn-sm" id="tab-register" onclick="switchPortalTab('register')">Register</button>
+          </div>
+          <div id="portal-login">
+            <div style="margin-bottom:12px"><label>Email</label><input type="email" id="portal-email" placeholder="your@email.com"/></div>
+            <div style="margin-bottom:14px"><label>Password</label><input type="password" id="portal-password" placeholder="Your password"/></div>
+            <button class="btn btn-primary" style="width:100%" onclick="portalLogin()">🔑 Login to Portal</button>
+          </div>
+          <div id="portal-register" style="display:none">
+            <div style="margin-bottom:12px"><label>Full Name</label><input type="text" id="reg-name" placeholder="John Smith"/></div>
+            <div style="margin-bottom:12px"><label>Email</label><input type="email" id="reg-email" placeholder="your@email.com"/></div>
+            <div style="margin-bottom:14px"><label>Password</label><input type="password" id="reg-password" placeholder="Create a password"/></div>
+            <button class="btn btn-primary" style="width:100%" onclick="portalRegister()">✅ Create Account</button>
+          </div>
+          <div id="portal-auth-error" style="margin-top:10px;font-size:12px;color:var(--danger);display:none"></div>
+        </div>
+        <!-- Portal Dashboard -->
+        <div id="portal-dashboard" style="display:none">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+            <div>
+              <div style="font-weight:700;font-size:15px" id="portal-welcome">Welcome back!</div>
+              <div style="font-size:12px;color:var(--muted)" id="portal-email-display"></div>
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="portalLogout()">Logout</button>
+          </div>
+          <div style="display:flex;gap:8px;margin-bottom:16px">
+            <button class="btn btn-primary btn-sm" onclick="loadPortalDocs()">📄 My Documents</button>
+            <button class="btn btn-ghost btn-sm" onclick="gotoPageById('payments','💳 Book Consultation')">💳 Book Session</button>
+          </div>
+          <div id="portal-docs-list"></div>
+          <div id="portal-no-docs" style="text-align:center;padding:20px;color:var(--muted);font-size:13px">No documents yet. Your legal documents will appear here after consultations.</div>
+        </div>
       </div>
     </div>
 
@@ -1259,11 +1389,211 @@ function deleteDoc(id){let docs=JSON.parse(localStorage.getItem('nnit-legal-docs
 function downloadResult(id,name){const text=document.getElementById(id).textContent;const blob=new Blob([text],{type:'text/plain'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name+'_'+Date.now()+'.txt';a.click()}
 function downloadDoc(){downloadResult('doc-result',document.getElementById('doc-type').value.replace(/\s+/g,'_'))}
 
+// ── PAYMENTS ──
+const STRIPE_PK = 'pk_test_51SSHA0GaTGR0sWqW73v2qCK6vbLfT4P1qHGFXhgppKIahQ31qu8VdwFf4VoS9xOqrxNXcnHj9QwTPVHR0sniDHRp00JwZlk1DB'
+const BACKEND = 'https://nnit-legal-ai-production.up.railway.app'
+let selectedPlanId = null
+
+function selectPlan(planId, price) {
+  selectedPlanId = planId
+  document.querySelectorAll('[id^="plan-"]').forEach(c => c.style.borderColor = '')
+  document.getElementById('plan-'+planId).style.borderColor = 'var(--accent)'
+  const labels = {'30min':'30 Minute Consultation — €50','1hour':'1 Hour Consultation — €99','contract-review':'Contract Review Session — €149','2hour':'2 Hour Consultation — €179','case-strategy':'Full Case Strategy Session — €249'}
+  document.getElementById('selected-plan-label').textContent = labels[planId]
+  document.getElementById('payment-form').style.display = 'block'
+  document.getElementById('payment-form').scrollIntoView({behavior:'smooth'})
+}
+
+async function processPayment() {
+  const name = document.getElementById('pay-name').value.trim()
+  const email = document.getElementById('pay-email').value.trim()
+  const date = document.getElementById('pay-date').value
+  const notes = document.getElementById('pay-notes').value
+  if (!name || !email) { alert('Please enter your name and email'); return }
+  if (!selectedPlanId) { alert('Please select a consultation type'); return }
+  try {
+    const roomName = 'nnit-legal-' + name.toLowerCase().replace(/\s+/g,'-') + '-' + Date.now()
+    const res = await fetch(BACKEND+'/payments/create-checkout', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({priceId:selectedPlanId, clientName:name, clientEmail:email, meetingRoom:roomName, meetingDate:date})
+    })
+    const data = await res.json()
+    if (data.error) { alert('Payment error: '+data.error); return }
+    // Send email notification
+    try {
+      await fetch(BACKEND+'/email/meeting-invite', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({clientName:name, clientEmail:email, meetingDate:date, meetingTime:'TBD', duration:'See booking', type:selectedPlanId, roomName, agenda:notes})
+      })
+    } catch(e) { console.log('Email error:', e) }
+    // Redirect to Stripe checkout
+    window.location.href = data.url
+  } catch(e) { alert('Error: '+e.message) }
+}
+
+// Check for payment success on load
+if(window.location.search.includes('payment=success')) {
+  setTimeout(() => {
+    gotoPageById('payments','💳 Book Consultation')
+    document.getElementById('payment-form').style.display='none'
+    document.getElementById('payment-success').style.display='block'
+  }, 500)
+}
+
+// ── CLIENT PORTAL ──
+let portalToken = localStorage.getItem('nnit-portal-token')
+let portalClient = JSON.parse(localStorage.getItem('nnit-portal-client')||'null')
+
+function switchPortalTab(tab) {
+  document.getElementById('portal-login').style.display = tab==='login'?'block':'none'
+  document.getElementById('portal-register').style.display = tab==='register'?'block':'none'
+  document.getElementById('tab-login').className = tab==='login'?'btn btn-primary btn-sm':'btn btn-ghost btn-sm'
+  document.getElementById('tab-register').className = tab==='register'?'btn btn-primary btn-sm':'btn btn-ghost btn-sm'
+}
+
+async function portalLogin() {
+  const email = document.getElementById('portal-email').value.trim()
+  const password = document.getElementById('portal-password').value
+  if (!email||!password) { showPortalError('Please enter email and password'); return }
+  try {
+    const res = await fetch(BACKEND+'/clients/login', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password})})
+    const data = await res.json()
+    if (data.error) { showPortalError(data.error); return }
+    portalToken = data.token
+    portalClient = data.client
+    localStorage.setItem('nnit-portal-token', data.token)
+    localStorage.setItem('nnit-portal-client', JSON.stringify(data.client))
+    showPortalDashboard()
+  } catch(e) { showPortalError(e.message) }
+}
+
+async function portalRegister() {
+  const name = document.getElementById('reg-name').value.trim()
+  const email = document.getElementById('reg-email').value.trim()
+  const password = document.getElementById('reg-password').value
+  if (!name||!email||!password) { showPortalError('All fields required'); return }
+  try {
+    const res = await fetch(BACKEND+'/clients/register', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,email,password})})
+    const data = await res.json()
+    if (data.error) { showPortalError(data.error); return }
+    portalToken = data.token
+    portalClient = data.client
+    localStorage.setItem('nnit-portal-token', data.token)
+    localStorage.setItem('nnit-portal-client', JSON.stringify(data.client))
+    showPortalDashboard()
+  } catch(e) { showPortalError(e.message) }
+}
+
+function showPortalError(msg) {
+  const el = document.getElementById('portal-auth-error')
+  el.textContent = msg; el.style.display = 'block'
+}
+
+function showPortalDashboard() {
+  document.getElementById('portal-auth').style.display = 'none'
+  document.getElementById('portal-dashboard').style.display = 'block'
+  document.getElementById('portal-welcome').textContent = 'Welcome, ' + (portalClient?.name||'Client') + '!'
+  document.getElementById('portal-email-display').textContent = portalClient?.email||''
+  loadPortalDocs()
+}
+
+async function loadPortalDocs() {
+  if (!portalToken) return
+  try {
+    const res = await fetch(BACKEND+'/clients/documents', {headers:{'Authorization':'Bearer '+portalToken}})
+    const docs = await res.json()
+    const list = document.getElementById('portal-docs-list')
+    const empty = document.getElementById('portal-no-docs')
+    if (!docs.length) { list.innerHTML=''; empty.style.display='block'; return }
+    empty.style.display = 'none'
+    list.innerHTML = docs.map(d=>`<div class="doc-row"><span class="doc-name">📄 ${d.title}</span><span class="doc-date">${new Date(d.created_at).toLocaleDateString()}</span><button class="btn btn-danger btn-sm" onclick="deletePortalDoc(${d.id})">Delete</button></div>`).join('')
+  } catch(e) { console.log('Portal docs error:', e) }
+}
+
+async function deletePortalDoc(id) {
+  if (!portalToken) return
+  await fetch(BACKEND+'/clients/documents/'+id, {method:'DELETE',headers:{'Authorization':'Bearer '+portalToken}})
+  loadPortalDocs()
+}
+
+function portalLogout() {
+  portalToken = null; portalClient = null
+  localStorage.removeItem('nnit-portal-token')
+  localStorage.removeItem('nnit-portal-client')
+  document.getElementById('portal-auth').style.display = 'block'
+  document.getElementById('portal-dashboard').style.display = 'none'
+}
+
+// Auto-login if token exists
+if (portalToken && portalClient) {
+  setTimeout(() => { if (document.getElementById('page-portal').classList.contains('active')) showPortalDashboard() }, 100)
+}
+
+// ── MULTI-LANGUAGE ──
+const LANG_PROMPTS = {
+  en: 'Respond in English.',
+  de: 'Antworte auf Deutsch.',
+  nl: 'Antwoord in het Nederlands.',
+  fr: 'Réponds en français.',
+  es: 'Responde en español.',
+  it: 'Rispondi in italiano.',
+  pt: 'Responda em português.',
+  ar: 'أجب باللغة العربية.',
+  zh: '请用中文回答。',
+  ja: '日本語で答えてください。',
+  ko: '한국어로 답변해주세요.',
+  ru: 'Отвечай на русском языке.'
+}
+let currentLang = 'en'
+
+function changeLang(lang) {
+  currentLang = lang
+  const speechLangs = {en:'en-GB',de:'de-DE',nl:'nl-NL',fr:'fr-FR',es:'es-ES',it:'it-IT',pt:'pt-PT',ar:'ar-SA',zh:'zh-CN',ja:'ja-JP',ko:'ko-KR',ru:'ru-RU'}
+  if (recognition) recognition.lang = speechLangs[lang]||'en-GB'
+  document.getElementById('reader-lang').value = speechLangs[lang]||'en-GB'
+}
+
+// Override callAI to include language
+const _callAI = callAI
+async function callAI(messages, systemPrompt) {
+  const langPrompt = LANG_PROMPTS[currentLang]||''
+  return _callAI(messages, (systemPrompt||'You are NNIT Legal AI, a professional legal assistant.') + ' ' + langPrompt)
+}
+
+// ── SCHEDULE EMAIL ──
+const _scheduleMeeting = scheduleMeeting
+async function scheduleMeeting() {
+  _scheduleMeeting()
+  const client = document.getElementById('sched-client').value.trim()
+  const email = document.getElementById('sched-email').value.trim()
+  const date = document.getElementById('sched-date').value
+  const time = document.getElementById('sched-time').value
+  const duration = document.getElementById('sched-duration').value
+  const type = document.getElementById('sched-type').value
+  const agenda = document.getElementById('sched-agenda').value
+  const roomName = 'nnit-'+client.toLowerCase().replace(/\s+/g,'-')+'-'+(date||'').replace(/-/g,'')
+  if (email) {
+    try {
+      await fetch(BACKEND+'/email/meeting-invite', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({clientName:client, clientEmail:email, meetingDate:date, meetingTime:time, duration, type, roomName, agenda})
+      })
+      const box = document.getElementById('sched-result-box')
+      if (box) box.innerHTML += '\n\n✅ Invitation email sent to ' + email
+    } catch(e) { console.log('Email send error:', e) }
+  }
+}
+
 // INIT
 updateBioChip()
 renderTemplates()
 document.getElementById('room-name').value='nnit-legal-'+Math.random().toString(36).substr(2,6)
 document.getElementById('sched-date').value=new Date().toISOString().split('T')[0]
+document.getElementById('pay-date').value=new Date().toISOString().split('T')[0]
+
+// Page titles update
+PAGE_TITLES.payments = '💳 Book Consultation'
+PAGE_TITLES.portal = '👤 Client Portal'
 </script>
 </body>
 </html>

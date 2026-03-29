@@ -9,6 +9,9 @@ import caseRoutes from "./routes/caseRoutes.js"
 import complianceRoutes from "./routes/complianceRoutes.js"
 import uploadRoutes from "./routes/uploadRoutes.js"
 import aiRoutes from "./routes/aiRoute.js"
+import paymentRoutes from "./routes/paymentRoutes.js"
+import emailRoutes from "./routes/emailRoutes.js"
+import clientRoutes from "./routes/clientRoutes.js"
 
 const app = express()
 
@@ -26,10 +29,14 @@ app.use("/cases", caseRoutes)
 app.use("/compliance", complianceRoutes)
 app.use("/upload", uploadRoutes)
 app.use("/api/legal-ai", aiRoutes)
+app.use("/payments", paymentRoutes)
+app.use("/email", emailRoutes)
+app.use("/clients", clientRoutes)
 
 const PORT = process.env.PORT || 5000
 app.listen(PORT, () => {
   console.log("NNIT Legal AI running on port " + PORT)
 })
+
 
 

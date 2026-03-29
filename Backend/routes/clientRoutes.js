@@ -2,35 +2,12 @@ import express from "express"
 import jwt from "jsonwebtoken"
 import bcrypt from "bcrypt"
 import pg from "pg"
+import crypto from "crypto"
 
 const router = express.Router()
 const { Pool } = pg
-const pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } })
+const pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: process.env.DATABASE_URL && process.env.DATABASE_URL.includes("railway") ? false : false })
 const JWT_SECRET = process.env.JWT_SECRET || "nnit-legal-secret-2024"
-
-// Init client tables
-async function initTables() {
-  try {
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS clients (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(255) NOT NULL,
-        email VARCHAR(255) UNIQUE NOT NULL,
-        password_hash VARCHAR(255) NOT NULL,
-        created_at TIMESTAMP DEFAULT NOW()
-      );
-      CREATE TABLE IF NOT EXISTS client_documents (
-        id SERIAL PRIMARY KEY,
-        client_id INTEGER REFERENCES clients(id),
-        title VARCHAR(500),
-        content TEXT,
-        type VARCHAR(100),
-        created_at TIMESTAMP DEFAULT NOW()
-      );
-    `)
-  } catch (e) { console.log("Table init:", e.message) }
-}
-initTables()
 
 router.post("/register", async (req, res) => {
   try {
@@ -56,6 +33,33 @@ router.post("/login", async (req, res) => {
     if (!valid) return res.status(401).json({ error: "Invalid email or password" })
     const token = jwt.sign({ id: client.id, email }, JWT_SECRET, { expiresIn: "7d" })
     res.json({ token, client: { id: client.id, name: client.name, email: client.email } })
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
+router.post("/forgot-password", async (req, res) => {
+  try {
+    const { email } = req.body
+    const result = await pool.query("SELECT * FROM clients WHERE email=$1", [email])
+    if (!result.rows.length) return res.json({ success: true, message: "If that email exists, a reset link was sent." })
+    const token = crypto.randomBytes(32).toString("hex")
+    const expires = new Date(Date.now() + 3600000)
+    await pool.query("UPDATE clients SET reset_token=$1, reset_expires=$2 WHERE email=$3", [token, expires, email])
+    res.json({ success: true, token, message: "Reset token generated. In production this would be emailed." })
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
+router.post("/reset-password", async (req, res) => {
+  try {
+    const { token, newPassword } = req.body
+    const result = await pool.query("SELECT * FROM clients WHERE reset_token=$1 AND reset_expires > NOW()", [token])
+    if (!result.rows.length) return res.status(400).json({ error: "Invalid or expired reset token" })
+    const hash = await bcrypt.hash(newPassword, 10)
+    await pool.query("UPDATE clients SET password_hash=$1, reset_token=NULL, reset_expires=NULL WHERE id=$2", [hash, result.rows[0].id])
+    res.json({ success: true, message: "Password reset successfully" })
   } catch (err) {
     res.status(500).json({ error: err.message })
   }

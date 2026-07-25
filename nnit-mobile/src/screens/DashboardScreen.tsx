@@ -15,10 +15,9 @@ const SECTIONS = [
   {
     title: 'MAIN',
     items: [
-      { icon: '🏠', label: 'Dashboard',         route: 'Dashboard',      badge: null },
       { icon: '💬', label: 'AI Legal Chat',      route: 'Chat',           badge: null },
-      { icon: '📎', label: 'Upload Documents',   route: 'Documents',      badge: null },
-      { icon: '📷', label: 'Camera Scanner',     route: 'Documents',      badge: 'NEW' },
+      { icon: '📎', label: 'Upload Documents',   route: 'Upload',         badge: null },
+      { icon: '📷', label: 'Camera Scanner',     route: 'Camera',         badge: 'NEW' },
       { icon: '📄', label: 'Document Generator', route: 'Documents',      badge: null },
       { icon: '⚖️', label: 'Case Builder',       route: 'Cases',          badge: null },
       { icon: '✅', label: 'Compliance Scanner', route: 'Compliance',     badge: null },
@@ -36,9 +35,9 @@ const SECTIONS = [
     title: 'TOOLS',
     items: [
       { icon: '🔍', label: 'Contract Analyzer',  route: 'Contracts',      badge: null },
-      { icon: '⚠️', label: 'Risk Assessment',    route: 'Contracts',      badge: null },
-      { icon: '📅', label: 'Extract Deadlines',  route: 'Contracts',      badge: null },
-      { icon: '👥', label: 'Identify Parties',   route: 'Contracts',      badge: null },
+      { icon: '⚠️', label: 'Risk Assessment',    route: 'RiskAssessment', badge: null },
+      { icon: '📅', label: 'Extract Deadlines',  route: 'Deadlines',      badge: null },
+      { icon: '👥', label: 'Identify Parties',   route: 'Parties',        badge: null },
     ],
   },
   {
@@ -46,7 +45,7 @@ const SECTIONS = [
     items: [
       { icon: '📋', label: '500+ Templates',     route: 'Templates',      badge: '500+' },
       { icon: '🎤', label: 'Voice Writer',        route: 'Voice',          badge: null },
-      { icon: '🔊', label: 'Voice Reader',        route: 'Voice',          badge: null },
+      { icon: '🔊', label: 'Voice Reader',        route: 'VoiceReader',    badge: null },
     ],
   },
   {
@@ -59,7 +58,7 @@ const SECTIONS = [
   {
     title: 'MY DOCS',
     items: [
-      { icon: '💾', label: 'Saved Documents',    route: 'Documents',      badge: null },
+      { icon: '💾', label: 'Saved Documents',    route: 'SavedDocs',      badge: null },
     ],
   },
 ];
@@ -109,7 +108,7 @@ export default function DashboardScreen({ navigation }: any) {
             <Text style={[s.topBadgeText, { color: colors.success }]}>GPT-4</Text>
           </View>
           <View style={[s.topBadge, { backgroundColor: colors.goldMuted, borderColor: colors.gold }]}>
-            <Text style={[s.topBadgeText, { color: colors.gold }]}>GDPR ✓</Text>
+            <Text style={[s.topBadgeText, { color: colors.gold }]}>GDPR ✔</Text>
           </View>
           <TouchableOpacity
             style={[s.topBadge, { backgroundColor: 'rgba(229,62,62,0.12)', borderColor: '#E53E3E' }]}
@@ -151,7 +150,7 @@ export default function DashboardScreen({ navigation }: any) {
               </View>
             </View>
             <TouchableOpacity style={s.bioBadge} onPress={() => navigation.navigate('Settings')}>
-              <Text style={s.bioBadgeText}>🔐 Bio Active</Text>
+              <Text style={s.bioBadgeText}>⚙️ Bio Active</Text>
             </TouchableOpacity>
           </LinearGradient>
         </View>
@@ -169,19 +168,14 @@ export default function DashboardScreen({ navigation }: any) {
                 <TouchableOpacity
                   key={item.label}
                   style={s.featureCard}
+                  activeOpacity={0.82}
                   onPress={() => navigation.navigate(item.route)}
-                  activeOpacity={0.8}
                 >
                   <LinearGradient colors={colors.gradientCard as any} style={s.featureInner}>
                     {item.badge && (
-                      <View style={[s.badge, {
-                        backgroundColor: `${BADGE_COLORS[item.badge] ?? colors.gold}20`,
-                        borderColor: BADGE_COLORS[item.badge] ?? colors.gold,
-                      }]}>
+                      <View style={[s.badge, { backgroundColor: `${BADGE_COLORS[item.badge]}22`, borderColor: BADGE_COLORS[item.badge] }]}>
                         {item.badge === 'LIVE' && <View style={s.badgeDot} />}
-                        <Text style={[s.badgeText, { color: BADGE_COLORS[item.badge] ?? colors.gold }]}>
-                          {item.badge}
-                        </Text>
+                        <Text style={[s.badgeText, { color: BADGE_COLORS[item.badge] }]}>{item.badge}</Text>
                       </View>
                     )}
                     <Text style={s.featureIcon}>{item.icon}</Text>
@@ -195,7 +189,7 @@ export default function DashboardScreen({ navigation }: any) {
 
         {/* Disclaimer */}
         <View style={s.disclaimer}>
-          <Text style={s.disclaimerIcon}>⚠️</Text>
+          <Text style={s.disclaimerIcon}>⚖️</Text>
           <Text style={s.disclaimerText}>
             AI legal advice is informational only. Consult a licensed attorney for official legal representation.
           </Text>

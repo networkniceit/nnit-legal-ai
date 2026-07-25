@@ -98,7 +98,7 @@ function HomeScreen({ navigation }: any) {
     { icon: "checkmark-circle-outline", label: "Compliance Scanner", screen: "Comply" },
     { icon: "warning-outline", label: "Risk Assessment", screen: "Risk" },
     { icon: "time-outline", label: "Extract Deadlines", screen: "Deadlines" },
-    { icon: "people-outline", label: "Identify Parties", screen: "Parties" },
+    { icon: "people-outline", label: "Identify Parties", screen: "Parties" },`n    { icon: "camera-outline", label: "Camera Scanner", screen: "Camera" },`n    { icon: "camera-outline", label: "Camera Scanner", screen: "Camera" },
     { icon: "copy-outline", label: "500+ Templates", screen: "Templates" },
     { icon: "mic-outline", label: "Voice Writer", screen: "Voice" },
     { icon: "card-outline", label: "Book Consultation", screen: "Pay" },
@@ -817,7 +817,7 @@ function MoreMenuScreen({ navigation }: any) {
     { icon: "checkmark-circle-outline", label: "Compliance Scanner", screen: "Comply" },
     { icon: "warning-outline", label: "Risk Assessment", screen: "Risk" },
     { icon: "time-outline", label: "Extract Deadlines", screen: "Deadlines" },
-    { icon: "people-outline", label: "Identify Parties", screen: "Parties" },
+    { icon: "people-outline", label: "Identify Parties", screen: "Parties" },`n    { icon: "camera-outline", label: "Camera Scanner", screen: "Camera" },`n    { icon: "camera-outline", label: "Camera Scanner", screen: "Camera" },
     { icon: "copy-outline", label: "500+ Templates", screen: "Templates" },
     { icon: "mic-outline", label: "Voice Tools", screen: "Voice" },
     { icon: "card-outline", label: "Book Consultation", screen: "Pay" },
@@ -865,8 +865,9 @@ export default function App() {
         <Stack.Screen name="Settings" component={SettingsScreen} />
         <Stack.Screen name="DocGen" component={DocGenScreen} />
         <Stack.Screen name="Meeting" component={MeetingScreen} />
-        <Stack.Screen name="Chat" component={ChatScreen} />
+        <Stack.Screen name="Camera" component={CameraScreen} />`n        <Stack.Screen name="Chat" component={ChatScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   )
 }
+

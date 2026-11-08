@@ -1,5 +1,5 @@
 ﻿import express from "express"
-import { askLegalAI, askAI } from "../services/aiEngine.js"
+import { askLegalAI, askAIWithProvider } from "../services/aiEngine.js"
 const router = express.Router()
 
 router.get("/", (req, res) => {
@@ -41,8 +41,8 @@ router.post("/complete", async (req, res) => {
     const { system, user } = req.body
     if (!user || typeof user !== "string") return res.status(400).json({ error: "user text is required" })
     if (user.length > 30000 || (system && String(system).length > 2000)) return res.status(413).json({ error: "Text too long" })
-    const answer = await askAI(system || "You are a helpful professional assistant.", user)
-    res.json({ answer })
+    const out = await askAIWithProvider(system || "You are a helpful professional assistant.", user)
+    res.json({ answer: out.answer, provider: out.provider })
   } catch (err) {
     res.status(500).json({ error: err.message })
   }

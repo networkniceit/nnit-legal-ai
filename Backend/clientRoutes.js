@@ -6,7 +6,8 @@ import pg from "pg"
 const router = express.Router()
 const { Pool } = pg
 const pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } })
-const JWT_SECRET = process.env.JWT_SECRET || "nnit-legal-secret-2024"
+const JWT_SECRET = process.env.JWT_SECRET || process.env.ADMIN_KEY
+if (!JWT_SECRET) throw new Error("JWT_SECRET or ADMIN_KEY must be set")
 
 // Init client tables
 async function initTables() {

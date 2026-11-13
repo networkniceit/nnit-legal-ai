@@ -7,7 +7,8 @@ import crypto from "crypto"
 const router = express.Router()
 const { Pool } = pg
 const pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: process.env.DATABASE_URL && process.env.DATABASE_URL.includes("railway") ? false : false })
-const JWT_SECRET = process.env.JWT_SECRET || "nnit-legal-secret-2024"
+const JWT_SECRET = process.env.JWT_SECRET || process.env.ADMIN_KEY
+if (!JWT_SECRET) throw new Error("JWT_SECRET or ADMIN_KEY must be set")
 
 router.post("/register", async (req, res) => {
   try {

@@ -2,6 +2,20 @@ import express from "express"
 import nodemailer from "nodemailer"
 const router = express.Router()
 
+// Safety: invite text is escaped, the address is checked, and each visitor can send only a few invites.
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])).slice(0, 300)
+const validEmail = e => typeof e === "string" && e.length <= 120 && /^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(e)
+const invites = new Map()
+const inviteLimit = (req, res, next) => {
+  const parts = String(req.headers["x-forwarded-for"] || req.ip).split(",")
+  const ip = parts[parts.length - 1].trim()
+  const now = Date.now()
+  const recent = (invites.get(ip) || []).filter(x => now - x < 600000)
+  if (recent.length >= 5) return res.status(429).json({ error: "Too many invitations, try again later" })
+  recent.push(now); invites.set(ip, recent)
+  next()
+}
+
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -10,9 +24,13 @@ const transporter = nodemailer.createTransport({
   },
 })
 
-router.post("/meeting-invite", async (req, res) => {
+router.post("/meeting-invite", inviteLimit, async (req, res) => {
   try {
-    const { clientName, clientEmail, meetingDate, meetingTime, duration, type, roomName, agenda } = req.body
+    const raw = req.body || {}
+    if (!validEmail(raw.clientEmail)) return res.status(400).json({ error: "A valid email is required" })
+    const clientEmail = raw.clientEmail
+    const [clientName, meetingDate, meetingTime, duration, type, agenda] = [raw.clientName, raw.meetingDate, raw.meetingTime, raw.duration, raw.type, raw.agenda].map(esc)
+    const roomName = String(raw.roomName ?? "").replace(/[^A-Za-z0-9_-]/g, "").slice(0, 80)
     const meetingLink = `https://meet.jit.si/${roomName}`
 
     await transporter.sendMail({
@@ -48,28 +66,6 @@ router.post("/meeting-invite", async (req, res) => {
     })
 
     res.json({ success: true, message: "Meeting invitation sent to " + clientEmail })
-  } catch (err) {
-    res.status(500).json({ error: err.message })
-  }
-})
-
-router.post("/payment-confirmation", async (req, res) => {
-  try {
-    const { clientName, clientEmail, amount, type, meetingRoom } = req.body
-    await transporter.sendMail({
-      from: `"NNIT Legal AI" <${process.env.GMAIL_USER}>`,
-      to: clientEmail,
-      subject: `Payment Confirmed — ${type}`,
-      html: `
-        <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px">
-          <h2>✅ Payment Confirmed</h2>
-          <p>Hello ${clientName}, your payment of €${(amount/100).toFixed(2)} for ${type} has been confirmed.</p>
-          <p>Your meeting room: <a href="https://meet.jit.si/${meetingRoom}">https://meet.jit.si/${meetingRoom}</a></p>
-          <p>Thank you for choosing NNIT Legal AI.</p>
-        </div>
-      `,
-    })
-    res.json({ success: true })
   } catch (err) {
     res.status(500).json({ error: err.message })
   }
